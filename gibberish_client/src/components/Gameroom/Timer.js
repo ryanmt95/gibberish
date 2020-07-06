@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react'
 
-function Timer() {
-  const [counter, setCounter] = useState(25)
+function Timer(props) {
+  const [counter, setCounter] = useState(props.seconds)
   useEffect(() => {
-    const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000)
-    return () => clearInterval(timer);
-  }, [counter])
+    if(counter > 0) {
+      setTimeout(() => setCounter(counter - 1), 1000)
+    } else {
+      props.transitionToState(props.nextState)
+      if(props.startNextRound) {
+        props.startNextRound()
+      }
+      if(props.updateScores) {
+        props.updateScores()
+      }
+      
+    }
+  }, [counter, props])
   return(
-    <div id="timer">
+    <div id="timer" style={{display: `${props.visible ? 'block' : 'none'}`}}>
       <h3>{counter}</h3>
     </div>
   )

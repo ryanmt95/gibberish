@@ -1,22 +1,16 @@
 import React from 'react'
 
-function PlayerListComponent() {
-	const mockplayers = [
-		{name: "gibberishking", points: 240},
-		{name: "gibberishqueen", points: 187},
-		{name: "gibberishboy", points: 148},
-		{name: "gibberishgirl", points: 134},
-	]
+function PlayerListComponent(props) {
 	return(
 		<div className="grid">
 			<h4 className="pb-4"><strong>Players</strong></h4>
-			{mockplayers.sort((a,b) => (a.points < b.points) ? 1 : -1).map((item, index) => (
-				<div className="d-flex mb-2 align-items-center">
+			{props.players.sort((a,b) => (a.points < b.points) ? 1 : -1).map((item, index) => (
+				<div className="d-flex mb-2 align-items-center" key={index}>
 					<div className="pr-4">
-						<img className="avatar" />
+						<img src={`https://ui-avatars.com/api/?name=${item.name}&background=c4c4c4&color=fff&size=64`} className="avatar" alt="avatar"/>
 					</div>
 					<div className="flex-grow-1">
-						<h5>{item.name}</h5></div>
+						<h5>{item.name} {item.name === props.myID ? "(you)" : null}</h5></div>
 					<div className="pr-4">
 						<h4>{item.points}</h4></div>
 				</div>

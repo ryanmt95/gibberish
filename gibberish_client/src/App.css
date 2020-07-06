@@ -16,7 +16,6 @@
 }
 
 #header {
-  height: 200px;
   text-align: center;
 }
 
@@ -32,4 +31,19 @@
   border-style: solid;
   border-color: darkgray;
   border-width: 4px;
+}
+
+#timer {
+  height: 80px;
+  width: 80px;
+  border-radius: 100%;
+  border-style: solid;
+  border-color: black;
+  border-width: 4px;
+  padding:20px;
+  margin: auto;
+}
+
+#QuestionCardComponent {
+  text-align: center;
 }

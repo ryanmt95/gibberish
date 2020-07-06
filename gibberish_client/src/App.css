@@ -1,3 +1,12 @@
+/* fonts */
+@font-face {
+  font-family: 'linglenglangregular';
+  src: url('assets/fonts/linglenglang-webfont.woff2') format('woff2'),
+       url('assets/fonts/linglenglang-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .App {
   height: 100vh;
   background-image: url('assets/bg.png');

@@ -19,7 +19,6 @@ function PlayerListComponent() {
 						<h5>{item.name}</h5></div>
 					<div className="pr-4">
 						<h4>{item.points}</h4></div>
-					
 				</div>
 			))}
 		</div>

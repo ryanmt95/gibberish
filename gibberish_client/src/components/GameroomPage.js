@@ -1,5 +1,6 @@
 import React from 'react'
 import PlayerListComponent from './PlayerListComponent'
+import PlayerAnswerComponent from './PlayerAnswerComponent'
 
 class GameroomPage extends React.Component {
 	render() {
@@ -15,12 +16,12 @@ class GameroomPage extends React.Component {
 
 					<div className="row">
 						<div id="left" className="col tile">
-							
 							<PlayerListComponent/>
 						</div>
 						
 						<div id="right" className="col tile">
 							<h4><strong>Your answer</strong></h4>
+							<PlayerAnswerComponent/>
 						</div>
 					</div>
 				</div>

@@ -2,14 +2,14 @@ import React from 'react'
 import PlayerListComponent from './PlayerListComponent'
 import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
-import { gamestates } from './GameStates'
+import { gamestates } from './gamestates/GameStates'
 
 class GameroomPage extends React.Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
-			gamestate: gamestates.ROUND_LOADING,
+			gamestate: gamestates.GAME_WAITING,
 			currentRound: 1,
 			maxRounds: 3,
 			myID: 'gibberish king',
@@ -19,24 +19,31 @@ class GameroomPage extends React.Component {
 				{name: "gibberish boy", points: 0},
 				{name: "gibberish girl", points: 0},
 			],
-			timePerRound: 5
+			roundScores: []
 		}
 	}
 
-	startNextRound = () => (
-		this.setState({currentRound: this.state.currentRound + 1})
-	)
+	startNextRound = () => {
+		if(this.state.currentRound < this.state.maxRounds) {
+			this.setState({currentRound: this.state.currentRound + 1})
+		} else {
+			this.transitionToState(gamestates.GAME_ENDED)
+		}
+	}
 
 	transitionToState = (newState) => (
 		this.setState({gamestate: newState})
 	)
 
 	updateScores = () => {
+		let roundScore = []
 		let players = this.state.players.map(player => {
-			player.points += Math.floor(Math.random() * 25)
+			let score = Math.floor(Math.random() * 25)
+			roundScore.push({name: player.name, points: score})
+			player.points += score
 			return player
 		})
-		this.setState({players: players})
+		this.setState(prevState => ({players: players, roundScores: [...prevState.roundScores, roundScore]}))
 	}
 
 	render() {
@@ -49,7 +56,7 @@ class GameroomPage extends React.Component {
 								currentRound={this.state.currentRound}
 								maxRounds={this.state.maxRounds}
 								gamestate={this.state.gamestate}
-								timePerRound={this.state.timePerRound}
+								roundScores={this.state.roundScores[this.state.roundScores.length - 1]}
 								startNextRound={this.startNextRound}
 								transitionToState={this.transitionToState}
 								updateScores={this.updateScores}/>

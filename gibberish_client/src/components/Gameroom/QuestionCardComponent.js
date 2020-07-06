@@ -1,28 +1,51 @@
 import React from 'react'
-import Timer from './Timer'
-import { gamestates } from './GameStates'
+import { gamestates } from './gamestates/GameStates'
+import RoundLoading from './gamestates/RoundLoading'
+import RoundOngoing from './gamestates/RoundOngoing'
+import RoundEnded from './gamestates/RoundEnded'
+import GameEnded from './gamestates/GameEnded'
+import GameWaiting from './gamestates/GameWaiting'
 
 function QuestionCardComponent(props) {
 
-  let message
+  let component
   if(props.gamestate === gamestates.ROUND_LOADING) {
-    message = <h5 className="mt-4">round is starting...</h5>
+    component = <RoundLoading 
+                  transitionToState={props.transitionToState} 
+                  nextState={gamestates.ROUND_ONGOING}/>
   } else if(props.gamestate === gamestates.ROUND_ONGOING) {
-    message = <h2 className="mt-4">veer off mess sing oat</h2>
+    component = <RoundOngoing 
+                  transitionToState={props.transitionToState} 
+                  nextState={gamestates.ROUND_ENDED}
+                  updateScores={props.updateScores}/>
+  } else if(props.gamestate === gamestates.ROUND_ENDED) {
+    component = <RoundEnded 
+                  transitionToState={props.transitionToState} 
+                  nextState={gamestates.ROUND_LOADING}
+                  startNextRound={props.startNextRound}
+                  roundScores={props.roundScores}
+                  />
+  } else if(props.gamestate === gamestates.GAME_ENDED) {
+    component = <GameEnded/>
+  } else if(props.gamestate === gamestates.GAME_WAITING) {
+    component = <GameWaiting 
+                  transitionToState={props.transitionToState}
+                  nextState={gamestates.ROUND_LOADING}/>
   }
 
   return(
     <div id="QuestionCardComponent">
       <h3><strong>Round {props.currentRound}/{props.maxRounds}</strong></h3>
-      <Timer 
+
+      {/* <Timer 
         gamestate={props.gamestate}
         startNextRound={props.startNextRound}
         currentRound={props.currentRound}
         maxRounds={props.maxRounds}
         timePerRound={props.timePerRound}
         transitionToState={props.transitionToState}
-        updateScores={props.updateScores}/>
-      {message}
+        updateScores={props.updateScores}/> */}
+      {component}
     </div>
   )
 }

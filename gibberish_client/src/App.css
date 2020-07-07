@@ -1,3 +1,12 @@
+/* fonts */
+@font-face {
+  font-family: 'linglenglangregular';
+  src: url('assets/fonts/linglenglang-webfont.woff2') format('woff2'),
+       url('assets/fonts/linglenglang-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .App {
   height: 100vh;
   background-image: url('assets/bg.png');
@@ -48,3 +57,39 @@
 #QuestionCardComponent {
   text-align: center;
 }
+
+#landingPage {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+#title {
+  font-family: 'linglenglangregular';
+  color: #F4D35E;
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  font-size: 96px;
+  line-height: 88px;
+}
+
+hr {
+  border-top: 1px solid white;
+}
+
+h6 { 
+  display: flex; 
+  flex-direction: row; 
+  color: rgba(255, 255, 255, 0.75);;
+  font-size: 16px;
+} 
+
+h6:before, h6:after { 
+    content: ""; 
+    flex: 1 1; 
+    border-bottom: 2px solid white; 
+    text-align: center;
+    margin: auto; 
+} 

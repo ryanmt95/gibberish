@@ -1,6 +1,6 @@
 import React from 'react'
 
-function NicknameModal( { handleClose, isShowingModal, action }) {
+function NicknameModal({handleClose, isShowingModal, action}) {
     const showHideClassName = isShowingModal ? "modal display-block" : "modal display-none"
     return (
         <div className={showHideClassName} role="dialog" aria-hidden="true">

@@ -19,7 +19,7 @@ class LandingPage extends React.Component {
     }
 
 	render() {
-        const { isShowingModal, clickedButton } = this.state
+        const {isShowingModal, clickedButton} = this.state
 		return (
             <div>
                 <div className="container" id="landingPage">

@@ -42,21 +42,23 @@ class GameroomPage extends React.Component {
 			roundScore.push({name: player.name, points: score})
 			player.points += score
 			return player
-		})
+		}).sort((a,b) => (a.points < b.points) ? 1 : -1)
 		this.setState(prevState => ({players: players, roundScores: [...prevState.roundScores, roundScore]}))
 	}
 
 	render() {
+		const {gamestate, currentRound, maxRounds, myID, players, roundScores} = this.state
 		return (
 			<div className="container">
 				<div className="grid">
 					<div className="row header">
 						<div id="header" className="col tile">
 							<QuestionCardComponent 
-								currentRound={this.state.currentRound}
-								maxRounds={this.state.maxRounds}
-								gamestate={this.state.gamestate}
-								roundScores={this.state.roundScores[this.state.roundScores.length - 1]}
+								currentRound={currentRound}
+								maxRounds={maxRounds}
+								gamestate={gamestate}
+								roundScores={roundScores[roundScores.length - 1]}
+								players={players}
 								startNextRound={this.startNextRound}
 								transitionToState={this.transitionToState}
 								updateScores={this.updateScores}/>
@@ -66,12 +68,13 @@ class GameroomPage extends React.Component {
 					<div className="row">
 						<div id="left" className="col tile">
 							<PlayerListComponent 
-								players={this.state.players} 
-								myID={this.state.myID}/>
+								players={players} 
+								myID={myID}/>
 						</div>
 						
 						<div id="right" className="col tile">
-							<PlayerAnswerComponent/>
+							<PlayerAnswerComponent
+								gamestate={gamestate}/>
 						</div>
 					</div>
 				</div>

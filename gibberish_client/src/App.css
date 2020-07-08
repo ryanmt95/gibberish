@@ -137,3 +137,32 @@ h6:before, h6:after {
   font-size: 48px;
   line-height: 44px;
 }
+
+#star_gold, #star_silver, #star_bronze {
+  border-radius: 100%;
+  border-style: solid;
+  border-width: 8px;
+  padding: 8px;
+  margin: 24px;
+}
+
+#star_gold {
+  background-color: #FFCD0E;
+  border-color: #FEE449;
+  height: 80px;
+  width: 80px;
+}
+
+#star_silver {
+  background-color: #D9D9D9;
+  border-color: #EDF1F4;
+  height: 72px;
+  width: 72px;
+}
+
+#star_bronze {
+  background-color: #FE993F;
+  border-color: #FFC174;
+  height: 64px;
+  width: 64px;
+}

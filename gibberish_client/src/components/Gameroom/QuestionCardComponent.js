@@ -5,9 +5,10 @@ import RoundOngoing from './gamestates/RoundOngoing'
 import RoundEnded from './gamestates/RoundEnded'
 import GameEnded from './gamestates/GameEnded'
 import GameWaiting from './gamestates/GameWaiting'
+import RoomDetailComponent from './RoomDetailComponent'
 
 function QuestionCardComponent(props) {
-  const { currentRound, maxRounds, gamestate, roundScores, players, startNextRound, transitionToState, updateScores } = props
+  const { roomId, currentRound, maxRounds, gamestate, roundScores, players, startNextRound, transitionToState, updateScores } = props
 
   let component
   if(gamestate === gamestates.ROUND_LOADING) {
@@ -35,7 +36,10 @@ function QuestionCardComponent(props) {
 
   return(
     <div id="QuestionCardComponent">
-      <h3><strong>Round {currentRound}/{maxRounds}</strong></h3>
+      <RoomDetailComponent
+        currentRound={currentRound}
+        maxRounds={maxRounds}
+        roomId={roomId}/>
       {component}
     </div>
   )

@@ -9,6 +9,7 @@ class GameroomPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			roomId: 1234,
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 1,
 			maxRounds: 3,
@@ -47,13 +48,14 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const {gamestate, currentRound, maxRounds, myID, players, roundScores} = this.state
+		const { roomId, gamestate, currentRound, maxRounds, myID, players, roundScores} = this.state
 		return (
 			<div className="container">
 				<div className="grid">
 					<div className="row header">
 						<div id="header" className="col tile">
 							<QuestionCardComponent 
+								roomId={roomId}
 								currentRound={currentRound}
 								maxRounds={maxRounds}
 								gamestate={gamestate}

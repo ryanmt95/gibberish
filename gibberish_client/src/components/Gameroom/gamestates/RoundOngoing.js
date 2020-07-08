@@ -2,14 +2,15 @@ import React from 'react'
 import Timer from '../Timer'
 
 function RoundOngoing(props) {
+  const {transitionToState, nextState, updateScores} = props
   return(
     <div>
       <Timer 
         visible={true}
-        transitionToState={props.transitionToState} 
+        transitionToState={transitionToState} 
         seconds={5} 
-        nextState={props.nextState}
-        updateScores={props.updateScores}/>
+        nextState={nextState}
+        updateScores={updateScores}/>
       <h2>veer off mess sing oat</h2>
     </div>
   )

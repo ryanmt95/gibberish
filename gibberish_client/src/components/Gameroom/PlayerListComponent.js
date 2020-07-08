@@ -4,7 +4,7 @@ function PlayerListComponent(props) {
 	return(
 		<div className="grid">
 			<h4 className="pb-4"><strong>Players</strong></h4>
-			{props.players.sort((a,b) => (a.points < b.points) ? 1 : -1).map((item, index) => (
+			{props.players.map((item, index) => (
 				<div className="d-flex mb-2 align-items-center" key={index}>
 					<div className="pr-4">
 						<img src={`https://ui-avatars.com/api/?name=${item.name}&background=c4c4c4&color=fff&size=64`} className="avatar" alt="avatar"/>

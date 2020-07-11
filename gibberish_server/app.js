@@ -22,6 +22,6 @@ app.use(bodyParser.urlencoded({
 }));
 
 //Routes for application
-require('./routes')(app);
+require('./routes.js')(app);
 
 module.exports = app;

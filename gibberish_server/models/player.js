@@ -1,4 +1,4 @@
-class player {
+class Player {
     constructor(name) {
         this.name = name;
         this.totalScore = 0;
@@ -18,3 +18,5 @@ class player {
         this.lastScore = newScore;
     }
 }
+
+module.exports = Player;

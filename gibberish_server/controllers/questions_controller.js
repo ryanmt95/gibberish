@@ -1,7 +1,7 @@
 const QuestionBank = require('../mongo_models/question_bank');
 const questions = require('../sample_questions')
 
-class questionsController {
+class QuestionsController {
 
     // populate question bank collection in mongodb 
     static createQuestions(req, res) {
@@ -10,7 +10,7 @@ class questionsController {
                 console.log(err)
             })
         }
-        res.send("Create Question Successfull")
+        res.send("Create Question Successful")
     }
 
     static getRandomQuestion(req, res) {
@@ -28,4 +28,4 @@ class questionsController {
     }
 }
 
-module.exports = questionsController;
+module.exports = QuestionsController;

@@ -1,4 +1,4 @@
-const questionsController = require('./controllers/questions_controller')
+const QuestionsController = require('./controllers/questions_controller')
 
 module.exports = (app) => {
 
@@ -6,6 +6,6 @@ module.exports = (app) => {
 
 
     // question and answer APIs
-    app.get('/create_questions', questionsController.createQuestions);
-    app.get('/question', questionsController.getRandomQuestion);
+    app.get('/create_questions', QuestionsController.createQuestions);
+    app.get('/question', QuestionsController.getRandomQuestion);
 }

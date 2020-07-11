@@ -1,4 +1,4 @@
-import uid from 'uid';
+const uid = require("uid");
 
 
 const STATE = {"stop":"STOPING", "play":"PLAYING", "pause":"PAUSING"}
@@ -11,6 +11,20 @@ class Room {
         this.round = 0;
         this.players = [];
         this.remainingTime = 0;
+    }
+
+    toJSON() {
+        let players = []
+        for (let player of this.players) {
+            players.push(JSON.stringify(player));
+        }
+        return {
+            roomId:        this.id,
+            gameState:     this.state,
+            currentRound:  this.round,
+            players:       players,
+            remainingTime: this.remainingTime,
+        };
     }
 
     startRound() {
@@ -32,3 +46,5 @@ class Room {
         this.players.push(newPlayer);
     }
 }
+
+module.exports = Room;

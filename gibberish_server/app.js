@@ -6,12 +6,14 @@ const http = require('http');
 const mongoose = require('mongoose')
 require('dotenv').config()
 
+const questionbank = require("./mongo_models/question_bank");
+
 const app = express();
 const server = http.createServer(app);
 const PORT = 4000;
 
 // connect to mongo database
-mongoose.connect(process.env.MONGODB_URL, { useUnifiedTopology: true, useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URL, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 const connection = mongoose.connection;
 

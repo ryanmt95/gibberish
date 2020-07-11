@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const questionBankSchema = new mongoose.Schema(
+const questionBankSchema = new Schema(
     {
         question: {
             type: String,
@@ -13,9 +14,10 @@ const questionBankSchema = new mongoose.Schema(
             unique: true,
             required: true
         }
-    }
+    },
+    { collection: 'questionbank' }
 );
 
 const QuestionBank = mongoose.model('QuestionBank', questionBankSchema)
 
-module.export = QuestionBank
+module.exports = QuestionBank

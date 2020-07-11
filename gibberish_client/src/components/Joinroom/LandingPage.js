@@ -6,20 +6,29 @@ class LandingPage extends React.Component {
         super(props);
         this.state = {
             isShowingModal: false,
-            clickedButton: ''
+            clickedButton: '',
+            roomCode: ''
         }
     }
 
     showModal = (buttonName) => {
-        this.setState({isShowingModal: true, clickedButton: buttonName})
+        if(buttonName === 'join_room' && this.state.roomCode === '') {
+            alert('Please enter a valid room code!')
+        } else {
+            this.setState({isShowingModal: true, clickedButton: buttonName})
+        }
     }
 
     hideModal = () => {
         this.setState({isShowingModal: false})
     }
 
+    roomCodeFieldChanged = event => {
+        this.setState({roomCode: event.target.value})
+    }
+
 	render() {
-        const {isShowingModal, clickedButton} = this.state
+        const {isShowingModal, clickedButton, roomCode} = this.state
 		return (
             <div>
                 <div className="container" id="landingPage">
@@ -28,7 +37,7 @@ class LandingPage extends React.Component {
                         <br />
                         <div>
                             <div className="input-group w-25 mx-auto">
-                                <input type="text" className="form-control text-center rounded-pill" placeholder="Enter room code"/>
+                                <input type="text" className="form-control text-center rounded-pill" placeholder="Enter room code" value={roomCode} onChange={this.roomCodeFieldChanged}/>
                             </div>
                             <br />
                             <button className="btn btn-warning w-25" id="joinRoomButton" onClick={() => this.showModal('join_room')}>Join room</button>
@@ -39,7 +48,7 @@ class LandingPage extends React.Component {
                         <button className="btn btn-success w-25" id="joinRoomButton" onClick={() => this.showModal('create_room')}>Create new room</button>
                     </div>
                 </div>
-                {isShowingModal && <NicknameModal isShowingModal={isShowingModal} handleClose={this.hideModal} action={clickedButton} />}
+                {isShowingModal && <NicknameModal isShowingModal={isShowingModal} handleClose={this.hideModal} action={clickedButton} roomCode={roomCode}/>}
             </div>
 		)
 	}

@@ -1,11 +1,11 @@
-const { loginController, questionAndAnswerController } = require('../controllers')
+const QuestionsController = require('./controllers/questions_controller')
 
 module.exports = (app) => {
 
     // login APIs
-    app.get('/api/login/sayHello', loginController.sayHello);
-    app.get('/api/login/sayGoodbye', loginController.sayGoodbye);
+
 
     // question and answer APIs
-    // ...
+    app.get('/create_questions', QuestionsController.createQuestions);
+    app.get('/question', QuestionsController.getRandomQuestion);
 }

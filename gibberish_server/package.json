@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "http": "0.0.1-security",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "uid": "^1.0.0"
   }
 }

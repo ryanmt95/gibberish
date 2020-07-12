@@ -4,6 +4,8 @@ import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
 import { gamestates } from './gamestates/GameStates'
 
+import API from '../../api/api'
+
 class GameroomPage extends React.Component {
 
 	constructor(props) {
@@ -20,8 +22,21 @@ class GameroomPage extends React.Component {
 				{name: "gibberish boy", points: 0},
 				{name: "gibberish girl", points: 0},
 			],
-			roundScores: []
+			roundScores: [],
+			currentQuestion: '',
+			currentAnswer:''
 		}
+	}
+
+	componentDidMount() {
+		this.getQuestion();
+	}
+
+	getQuestion = () => {
+		API.get('/question')
+		.then(res => {
+			this.setState({ currentQuestion: res.data.question, currentAnswer: res.data.answer })
+		})
 	}
 
 	startNextRound = () => {
@@ -30,6 +45,7 @@ class GameroomPage extends React.Component {
 		} else {
 			this.transitionToState(gamestates.GAME_ENDED)
 		}
+		this.getQuestion()
 	}
 
 	transitionToState = (newState) => (
@@ -48,7 +64,7 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const { roomId, gamestate, currentRound, maxRounds, myID, players, roundScores} = this.state
+		const { roomId, gamestate, currentRound, maxRounds, myID, players, roundScores, currentQuestion, currentAnswer } = this.state
 		return (
 			<div className="container">
 				<div className="grid">
@@ -63,7 +79,9 @@ class GameroomPage extends React.Component {
 								players={players}
 								startNextRound={this.startNextRound}
 								transitionToState={this.transitionToState}
-								updateScores={this.updateScores}/>
+								updateScores={this.updateScores}
+								currentQuestion={currentQuestion}
+								currentAnswer={currentAnswer}/>
 						</div>
 					</div>
 

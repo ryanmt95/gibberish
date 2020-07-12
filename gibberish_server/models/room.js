@@ -35,12 +35,17 @@ class Room {
         };
     }
 
+    start() {
+        if (this.state == STATE.GAME_WAITING) {
+            this.state = STATE.ROUND_LOADING;
+            this.startedTime = new Date();
+        }
+    }
+
     nextState() {
         let now = new Date();
         switch(this.state) {
             case STATE.GAME_WAITING:
-                this.state = STATE.ROUND_LOADING;
-                this.startedTime = now;
                 break;
             case STATE.ROUND_LOADING:
                 if (now - this.startedTime >= 3000) {
@@ -79,7 +84,7 @@ function newRoom() {
     return saveRoom(r);
 }
 
-function getRoomInfoAsJson(roomId) {
+function getRoomInfoAsJson(roomId, client) {
     client.get(roomId, function (error, result) {
         if (error) {
             console.error(error);
@@ -90,13 +95,19 @@ function getRoomInfoAsJson(roomId) {
     }
 }
 
+function startGame(roomId) {
+    let r = deserializeRoom(getRoomInfoAsJson(roomId));
+    r.start();
+    return saveRoom(r);
+}
+
 function updateState(roomId) {
     let r = deserializeRoom(getRoomInfoAsJson(roomId));
     r.nextState();
     return saveRoom(r);
 }
 
-function saveRoom(roomObject) {
+function saveRoom(roomObject, client) {
     client.set(roomObject.id, JSON.stringify(roomObject), redis.print);
     return roomObject.id;
 }
@@ -118,5 +129,6 @@ function deserializeRoom(jsonRoom) {
 module.exports = {
     newRoom: newRoom,
     getRoomInfoAsJson: getRoomInfoAsJson,
+    startGame:startGame,
     updateState: updateState
 }

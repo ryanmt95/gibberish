@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export default axios.create({
-  baseURL: `http://jsonplaceholder.typicode.com/` //placeholder 
+  baseURL: 'http://localhost:4000'
 });

@@ -1,10 +1,8 @@
 import React from 'react'
 import Timer from '../Timer'
-import mockqna from '../../../assets/mockqna'
-
 
 function RoundOngoing(props) {
-  const {transitionToState, nextState, updateScores} = props
+  const {transitionToState, nextState, updateScores, currentQuestion, currentAnswer } = props
   return(
     <div>
       <Timer 
@@ -13,7 +11,7 @@ function RoundOngoing(props) {
         seconds={5} 
         nextState={nextState}
         updateScores={updateScores}/>
-      <h2>{mockqna[Math.floor(Math.random() * mockqna.length)].question}</h2>
+      <h2>{currentQuestion}</h2>
     </div>
   )
 }

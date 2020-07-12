@@ -56,21 +56,24 @@ class LandingPage extends React.Component {
     
     createRoom = nickname => {
         // console.log('createRoom')
-        this.setState({roomCode: '1234'})
-        this.props.history.push(`room/1234`);
+        let randFourDigitCode = Math.floor(1000 + Math.random() * 9000)
+        console.log(randFourDigitCode)
+        this.setState({roomCode: randFourDigitCode})
+        this.props.history.push(`room/${randFourDigitCode}`)
 
         // API.post('/create_room')
         //     .then(res => {
         //         console.log(res)
-        //         this.setState({ roomCode: res.roomCode })
+        //         // this.setState({ roomCode: res.roomCode })
         //     })
-
         // console.log(nickname)
 	}
 
 
     joinRoom = () => {
         // console.log('joinRoom')
+        const { roomCode } = this.state;
+        this.props.history.push(`room/${roomCode}`);
     }
 
 	render() {

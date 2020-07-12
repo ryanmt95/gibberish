@@ -9,7 +9,7 @@ class GameroomPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			roomId: 1234,
+			roomId: props.match.params.id,
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 1,
 			maxRounds: 3,

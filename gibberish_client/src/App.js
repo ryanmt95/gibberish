@@ -4,18 +4,16 @@ import './App.css';
 import GameroomPage from './components/Gameroom/GameroomPage';
 import LandingPage from './components/Joinroom/LandingPage';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import InvalidPage from './components/InvalidPage';
 
 function App() {
   return (
     <Router>
       <div className="App">
       <Switch>
-        <Route path="/room">
-          <GameroomPage/>
-        </Route>
-        <Route path="/">
-          <LandingPage/>
-        </Route>
+        <Route exact path="/room/:id" component={GameroomPage}/>
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path='*' component={InvalidPage}/>
       </Switch>
       </div>
     </Router>

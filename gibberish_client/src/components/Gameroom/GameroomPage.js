@@ -15,9 +15,8 @@ class GameroomPage extends React.Component {
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 1,
 			maxRounds: 3,
-			myID: 'gibberish king',
 			players: [
-				{name: "gibberish king", points: 0},
+				{name: this.props.nickname, points: 0},
 				{name: "gibberish queen", points: 0},
 				{name: "gibberish boy", points: 0},
 				{name: "gibberish girl", points: 0},
@@ -64,7 +63,8 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const { roomId, gamestate, currentRound, maxRounds, myID, players, roundScores, currentQuestion, currentAnswer } = this.state
+		const { roomId, gamestate, currentRound, maxRounds, players, roundScores, currentQuestion, currentAnswer } = this.state
+		const { nickname } = this.props
 		return (
 			<div className="container">
 				<div className="grid">
@@ -89,7 +89,7 @@ class GameroomPage extends React.Component {
 						<div id="left" className="col tile">
 							<PlayerListComponent 
 								players={players} 
-								myID={myID}/>
+								myID={nickname}/>
 						</div>
 						
 						<div id="right" className="col tile">

@@ -1,5 +1,6 @@
 import React from 'react'
 import NicknameModal from "./NicknameModal"
+// import API from '../../api/api'
 
 class LandingPage extends React.Component {
     constructor(props) {
@@ -7,7 +8,7 @@ class LandingPage extends React.Component {
         this.state = {
             isShowingModal: false,
             clickedButton: '',
-            roomCode: ''
+            roomCode: '',
         }
     }
 
@@ -27,8 +28,53 @@ class LandingPage extends React.Component {
         this.setState({roomCode: event.target.value})
     }
 
+    nicknameFieldChanged = event => {
+        const { updateNickname } = this.props
+        updateNickname(event.target.value)
+    }
+
+    submitModal = () => {
+        this.setState({isShowingModal: false})
+        const { roomCode, clickedButton} = this.state
+        const { nickname } = this.props
+
+        if(clickedButton === 'join_room') {
+            if(nickname && roomCode) {
+                this.joinRoom(nickname, roomCode)
+            } else {
+                alert('Please input a valid roomCode and nickname')
+            }
+           
+        } else if (clickedButton === 'create_room') {
+            if(nickname) {
+                this.createRoom(nickname)
+            } else {
+                alert('Please input a valid nickname')
+            }
+        }
+    }
+    
+    createRoom = nickname => {
+        // console.log('createRoom')
+        this.setState({roomCode: '1234'})
+        this.props.history.push(`room/1234`);
+
+        // API.post('/create_room')
+        //     .then(res => {
+        //         console.log(res)
+        //         this.setState({ roomCode: res.roomCode })
+        //     })
+
+        // console.log(nickname)
+	}
+
+
+    joinRoom = () => {
+        // console.log('joinRoom')
+    }
+
 	render() {
-        const {isShowingModal, clickedButton, roomCode} = this.state
+        const {isShowingModal, roomCode} = this.state
 		return (
             <div>
                 <div className="container" id="landingPage">
@@ -48,7 +94,7 @@ class LandingPage extends React.Component {
                         <button className="btn btn-success w-25" id="joinRoomButton" onClick={() => this.showModal('create_room')}>Create new room</button>
                     </div>
                 </div>
-                {isShowingModal && <NicknameModal isShowingModal={isShowingModal} handleClose={this.hideModal} action={clickedButton} roomCode={roomCode}/>}
+                {isShowingModal && <NicknameModal isShowingModal={isShowingModal} handleClose={this.hideModal} handleNicknameChange={this.nicknameFieldChanged} submitModal={this.submitModal}/>}
             </div>
 		)
 	}

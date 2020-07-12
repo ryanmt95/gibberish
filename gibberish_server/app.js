@@ -6,11 +6,9 @@ const http = require('http');
 const mongoose = require('mongoose')
 require('dotenv').config()
 
-const questionbank = require("./mongo_models/question_bank");
-
 const app = express();
 const server = http.createServer(app);
-const PORT = 4000;
+const PORT = 3000;
 
 // connect to mongo database
 mongoose.connect(process.env.MONGODB_URL, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
@@ -27,9 +25,7 @@ server.listen(PORT, () => {
 
 // Log requests to the console.
 app.use(logger('dev'));
-app.use(cors({
-    origin: 'localhost:4000'
-}));
+
 // extract the body of an incoming request and parse into Json object
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({

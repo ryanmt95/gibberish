@@ -4,14 +4,14 @@ const questions = require('../sample_questions')
 class QuestionsController {
 
     // populate question bank collection in mongodb 
-    static createQuestions(req, res) {
-        for (let question of questions) {
-            QuestionBank.create(question, (err) => {
-                console.log(err)
-            })
-        }
-        res.send("Create Question Successful")
-    }
+    // static createQuestions(req, res) {
+    //     for (let question of questions) {
+    //         QuestionBank.create(question, (err) => {
+    //             console.log(err)
+    //         })
+    //     }
+    //     res.send("Create Question Successful")
+    // }
 
     static getRandomQuestion(req, res) {
         QuestionBank.countDocuments().exec(function (err, count) {

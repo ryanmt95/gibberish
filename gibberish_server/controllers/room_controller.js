@@ -10,10 +10,16 @@ class RoomController {
         return roomModel.getRoomInfoAsJson(req.params["roomId"])
     }
 
-    static createNewRoom(req, res) {
+    static async createNewRoom(req, res) {
         let r = new roomModel.Room();
         roomModel.saveRoom(r);
-        res.send(roomModel.getRoomInfoAsJson(r.id));
+        roomModel.getRoomInfoAsJson(r.id)
+            .then(result => {
+                res.send(result);
+            })
+            .catch(error => {
+                res.status(404).send(error);
+            })
     }
 
     static joinRoom(req, res) {
@@ -27,7 +33,7 @@ class RoomController {
         }
         r.players.push(new Player(nickname))
         roomModel.saveRoom(r, client);
-        res.sen(r.players[r.length-1].name);
+        res.sen(r.players[r.length - 1].name);
     }
 
     static startGame(req, res) {

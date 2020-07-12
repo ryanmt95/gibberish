@@ -107,13 +107,16 @@ class Room {
 }
 
 function getRoomInfoAsJson(roomId) {
-    client.get(roomId, function (error, result) {
-        if (error) {
-            console.error(error);
-            return {};
-        }
-        console.log('GET result ->' + result);
-        return JSON.parse(result);
+    return new Promise((res, rej) => {
+        client.get(roomId, function (error, result) {
+            if (error) {
+                console.error(error);
+                rej({});
+            } else {
+                console.log('GET result ->' + result);
+                res(JSON.parse(result));
+            }
+        })
     })
 }
 

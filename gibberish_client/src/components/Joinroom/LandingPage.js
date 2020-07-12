@@ -57,7 +57,6 @@ class LandingPage extends React.Component {
     createRoom = nickname => {
         // console.log('createRoom')
         let randFourDigitCode = Math.floor(1000 + Math.random() * 9000)
-        console.log(randFourDigitCode)
         this.setState({roomCode: randFourDigitCode})
         this.props.history.push(`room/${randFourDigitCode}`)
 

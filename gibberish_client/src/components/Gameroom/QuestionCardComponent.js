@@ -32,8 +32,7 @@ function QuestionCardComponent(props) {
     component = <GameEnded players={players}/>
   } else if(gamestate === gamestates.GAME_WAITING) {
     component = <GameWaiting 
-                  transitionToState={transitionToState}
-                  nextState={gamestates.ROUND_LOADING}/>
+                  roomId={roomId}/>
   }
 
   return(

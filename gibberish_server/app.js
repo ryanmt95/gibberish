@@ -28,7 +28,7 @@ server.listen(PORT, () => {
 // Log requests to the console.
 app.use(logger('dev'));
 app.use(cors({
-    origin: 'localhost:4000'
+    // origin: 'localhost:3000'
 }));
 // extract the body of an incoming request and parse into Json object
 app.use(bodyParser.json())

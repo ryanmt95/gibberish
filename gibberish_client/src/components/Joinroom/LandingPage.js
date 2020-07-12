@@ -1,6 +1,6 @@
 import React from 'react'
 import NicknameModal from "./NicknameModal"
-// import API from '../../api/api'
+import API from '../../api/api'
 
 class LandingPage extends React.Component {
     constructor(props) {
@@ -56,14 +56,14 @@ class LandingPage extends React.Component {
     
     createRoom = nickname => {
         // console.log('createRoom')
-        this.setState({roomCode: '1234'})
-        this.props.history.push(`room/1234`);
+        // this.setState({roomCode: '1234'})
+        // this.props.history.push(`room/1234`);
 
-        // API.post('/create_room')
-        //     .then(res => {
-        //         console.log(res)
-        //         this.setState({ roomCode: res.roomCode })
-        //     })
+        API.post('/create_room')
+            .then(res => {
+                console.log(res)
+                // this.setState({ roomCode: res.roomCode })
+            })
 
         // console.log(nickname)
 	}

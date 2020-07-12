@@ -23,7 +23,8 @@ class GameroomPage extends React.Component {
 			],
 			roundScores: [],
 			currentQuestion: '',
-			currentAnswer:''
+			currentAnswer: '', 
+			userAnswer: ''
 		}
 	}
 
@@ -36,6 +37,28 @@ class GameroomPage extends React.Component {
 		.then(res => {
 			this.setState({ currentQuestion: res.data.question, currentAnswer: res.data.answer })
 		})
+	}
+
+	getRoomDetails = () => {
+		API.get('/room/' + this.state.roomId)
+		.then(res => {
+			this.setState({ 
+				gamestate: res.data.gameState, 
+				currentRound: res.data.currentRound, 
+				players: res.data.players
+			})
+		})
+	}
+
+	submitAnswer = () => {
+		const {currentAnswer, userAnswer, roomId} = this.state
+		if(currentAnswer === userAnswer) {
+			API.post('/submit_answer', {
+				roomId: roomId, 
+				nickname: this.props.nickname
+			}).then(res => console.log(res))
+		}
+		this.setState({userAnswer: ''})
 	}
 
 	startNextRound = () => {

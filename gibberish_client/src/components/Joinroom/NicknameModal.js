@@ -1,7 +1,9 @@
 import React from 'react'
+import {Link} from 'react-router-dom'
 
-function NicknameModal({handleClose, isShowingModal, action}) {
+function NicknameModal({handleClose, isShowingModal, action, roomCode}) {
     const showHideClassName = isShowingModal ? "modal display-block" : "modal display-none"
+    roomCode = action === 'create_room' ? '1234' : roomCode
     return (
         <div className={showHideClassName} role="dialog" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered" role="document">
@@ -16,7 +18,7 @@ function NicknameModal({handleClose, isShowingModal, action}) {
                             <input type="text" className="form-control text-center rounded-pill" placeholder="Nickname"/>
                         </div>
                         <br />
-                        <button type="button" className="btn btn-success w-25" id="joinRoomButton">OK</button>
+                        <Link className='btn btn-success w-25' to={`/room/${roomCode}`}>OK</Link>
                     </div>
                 </div>
             </div>

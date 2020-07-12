@@ -1,34 +1,134 @@
-import uid from 'uid';
+const uid = require("uid");
+const Player = require("../models/player")
+
+const redis = require("redis");
+let port = 6379
+let host = "127.0.0.1"
+const client = redis.createClient(port, host);
+
+client.on('connect', function() {
+    console.error('Redis client connected');
+});
+
+client.on('error', function (err) {
+    console.error('Something went wrong ' + err);
+});
 
 
-const STATE = {"stop":"STOPING", "play":"PLAYING", "pause":"PAUSING"}
-Object.freeze(STATE)
+const STATE = {
+    "GAME_WAITING":"GAME_WAITING",
+    "ROUND_LOADING":"ROUND_LOADING",
+    "ROUND_ONGOING":"ROUND_ONGOING",
+    "ROUND_ENDED":"ROUND_ENDED",
+    "GAME_ENDED":"GAME_ENDED"
+}
+Object.freeze(STATE);
+const ROUND_NUMBER = 10;
+Object.freeze(ROUND_NUMBER);
 
 class Room {
-    constructor() {
-        this.id = uid();
-        this.state = STATE.stop
-        this.round = 0;
-        this.players = [];
-        this.remainingTime = 0;
+    constructor(id=uid(), state=STATE.GAME_WAITING, round=0, players=[]) {
+        this.id = id;
+        this.state = state;
+        this.round = round;
+        this.players = players;
+        this.startedTime = null;
     }
 
-    startRound() {
-        this.round++
-        this.remainingTime = 10;
-        this.state = STATE.PLAYING
-        setTimeout(function run() {
-            this.remainingTime--;
-            console.log(this.remainingTime);
-            if(this.remainingTime > 0) {
-                setTimeout(run, 1000);
-            } else {
-                this.state = STATE.pause
-            }
-        }, 1000);
+    toJSON() {
+        let players = []
+        for (let player of this.players) {
+            players.push(JSON.stringify(player));
+        }
+        return {
+            roomId:        this.id,
+            gameState:     this.state,
+            currentRound:  this.round,
+            players:       players,
+        };
+    }
+
+    start() {
+        if (this.state == STATE.GAME_WAITING) {
+            this.state = STATE.ROUND_LOADING;
+            this.startedTime = new Date();
+        }
+    }
+
+    nextState() {
+        let now = new Date();
+        switch(this.state) {
+            case STATE.GAME_WAITING:
+                break;
+            case STATE.ROUND_LOADING:
+                if (now - this.startedTime >= 3000) {
+                    this.state = STATE.ROUND_ONGOING;
+                    this.startedTime = now;
+                }
+                break;
+            case STATE.ROUND_ONGOING:
+                if (now - this.startedTime >= 10000) {
+                    this.state = STATE.ROUND_ENDED;
+                    this.startedTime = now;
+                }
+                break;
+            case STATE.ROUND_ENDED:
+                if (now - this.startedTime >= 5000) {
+                    if (this.round < ROUND_NUMBER) {
+                        this.state = STATE.ROUND_LOADING;
+                        this.startedTime = now;
+                    } else {
+                        this.state = STATE.GAME_ENDED;
+                    }
+                }
+                break;
+            case STATE.GAME_ENDED:
+                break;
+        }
     }
 
     addPlayer(newPlayer) {
         this.players.push(newPlayer);
     }
+
+    static deserializeRoom(jsonRoom) {
+        let players = [];
+        for (let player of jsonRoom.players) {
+            players.push(Player.deserializePlayer(JSON.parse(player)));
+        }
+        let r = new Room(
+            id=jsonRoom.roomId,
+            state=jsonRoom.gameState,
+            round=jsonRoom.currentRound,
+            players=players
+        );
+        return r;
+    }
+}
+
+function getRoomInfoAsJson(roomId) {
+    client.get(roomId, function (error, result) {
+        if (error) {
+            console.error(error);
+            return {};
+        }
+        console.log('GET result ->' + result);
+        return JSON.parse(result);
+    }
+}
+
+function getRoomInfoAsObject(roomId) {
+    return Room.deserializeRoom(getRoomInfoAsJson(roomId));
+}
+
+function saveRoom(roomObject) {
+    client.set(roomObject.id, JSON.stringify(roomObject), redis.print);
+    return roomObject.id;
+}
+
+module.exports = {
+    Room: Room,
+    getRoomInfoAsJson: getRoomInfoAsJson,
+    getRoomInfoAsObject:getRoomInfoAsObject,
+    saveRoom: saveRoom
 }

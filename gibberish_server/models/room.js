@@ -1,6 +1,19 @@
 const uid = require("uid");
 const Player = require("../models/player")
 
+const redis = require("redis");
+let port = 6379
+let host = "127.0.0.1"
+const client = redis.createClient(port, host);
+
+client.on('connect', function() {
+    console.error('Redis client connected');
+});
+
+client.on('error', function (err) {
+    console.error('Something went wrong ' + err);
+});
+
 
 const STATE = {
     "GAME_WAITING":"GAME_WAITING",
@@ -77,14 +90,23 @@ class Room {
     addPlayer(newPlayer) {
         this.players.push(newPlayer);
     }
+
+    static deserializeRoom(jsonRoom) {
+        let players = [];
+        for (let player of jsonRoom.players) {
+            players.push(Player.deserializePlayer(JSON.parse(player)));
+        }
+        let r = new Room(
+            id=jsonRoom.roomId,
+            state=jsonRoom.gameState,
+            round=jsonRoom.currentRound,
+            players=players
+        );
+        return r;
+    }
 }
 
-function newRoom() {
-    let r = new Room();
-    return saveRoom(r);
-}
-
-function getRoomInfoAsJson(roomId, client) {
+function getRoomInfoAsJson(roomId) {
     client.get(roomId, function (error, result) {
         if (error) {
             console.error(error);
@@ -95,40 +117,18 @@ function getRoomInfoAsJson(roomId, client) {
     }
 }
 
-function startGame(roomId) {
-    let r = deserializeRoom(getRoomInfoAsJson(roomId));
-    r.start();
-    return saveRoom(r);
+function getRoomInfoAsObject(roomId) {
+    return Room.deserializeRoom(getRoomInfoAsJson(roomId));
 }
 
-function updateState(roomId) {
-    let r = deserializeRoom(getRoomInfoAsJson(roomId));
-    r.nextState();
-    return saveRoom(r);
-}
-
-function saveRoom(roomObject, client) {
+function saveRoom(roomObject) {
     client.set(roomObject.id, JSON.stringify(roomObject), redis.print);
     return roomObject.id;
 }
 
-function deserializeRoom(jsonRoom) {
-    let players = [];
-    for (let player of jsonRoom.players) {
-        players.push(Player.deserializePlayer(JSON.parse(player)));
-    }
-    let r = new Room(
-        id=jsonRoom.roomId,
-        state=jsonRoom.gameState,
-        round=jsonRoom.currentRound,
-        players=players
-    );
-    return r;
-}
-
 module.exports = {
-    newRoom: newRoom,
+    Room: Room,
     getRoomInfoAsJson: getRoomInfoAsJson,
-    startGame:startGame,
-    updateState: updateState
+    getRoomInfoAsObject:getRoomInfoAsObject,
+    saveRoom: saveRoom
 }

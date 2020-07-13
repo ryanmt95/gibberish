@@ -114,7 +114,7 @@ function getRoomInfoAsJson(roomId) {
         }
         console.log('GET result ->' + result);
         return JSON.parse(result);
-    }
+    })
 }
 
 function getRoomInfoAsObject(roomId) {

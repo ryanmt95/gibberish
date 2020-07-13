@@ -8,7 +8,7 @@ import InvalidPage from './components/InvalidPage';
 
 class App extends React.Component {
   state = {
-    nickname: '',
+    nickname: 'hellopanda',
   }
 
   updateNickname = (nickname) => {

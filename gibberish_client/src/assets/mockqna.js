@@ -1,4 +1,4 @@
-const mockqna = [
+export const mockqna = [
   {
     question: "jock lit hip goo keys",
     answer: "chocolate chip cookies"
@@ -9,7 +9,7 @@ const mockqna = [
   },
   {
     question: "reef idge her ate her",
-    answer: "refridgerator"
+    answer: "refrigerator"
   },
   {
     question: "is bunch pops queer pans",

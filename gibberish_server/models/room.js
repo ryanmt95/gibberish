@@ -6,7 +6,7 @@ let port = 6379
 let host = "127.0.0.1"
 const client = redis.createClient(port, host);
 
-client.on('connect', function() {
+client.on('connect', function () {
     console.error('Redis client connected');
 });
 
@@ -16,18 +16,18 @@ client.on('error', function (err) {
 
 
 const STATE = {
-    "GAME_WAITING":"GAME_WAITING",
-    "ROUND_LOADING":"ROUND_LOADING",
-    "ROUND_ONGOING":"ROUND_ONGOING",
-    "ROUND_ENDED":"ROUND_ENDED",
-    "GAME_ENDED":"GAME_ENDED"
+    "GAME_WAITING": "GAME_WAITING",
+    "ROUND_LOADING": "ROUND_LOADING",
+    "ROUND_ONGOING": "ROUND_ONGOING",
+    "ROUND_ENDED": "ROUND_ENDED",
+    "GAME_ENDED": "GAME_ENDED"
 }
 Object.freeze(STATE);
 const ROUND_NUMBER = 10;
 Object.freeze(ROUND_NUMBER);
 
 class Room {
-    constructor(id=uid(), state=STATE.GAME_WAITING, round=0, players=[]) {
+    constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = []) {
         this.id = id;
         this.state = state;
         this.round = round;
@@ -41,10 +41,10 @@ class Room {
             players.push(JSON.stringify(player));
         }
         return {
-            roomId:        this.id,
-            gameState:     this.state,
-            currentRound:  this.round,
-            players:       players,
+            roomId: this.id,
+            gameState: this.state,
+            currentRound: this.round,
+            players: players,
         };
     }
 
@@ -57,7 +57,7 @@ class Room {
 
     nextState() {
         let now = new Date();
-        switch(this.state) {
+        switch (this.state) {
             case STATE.GAME_WAITING:
                 break;
             case STATE.ROUND_LOADING:
@@ -97,23 +97,26 @@ class Room {
             players.push(Player.deserializePlayer(JSON.parse(player)));
         }
         let r = new Room(
-            id=jsonRoom.roomId,
-            state=jsonRoom.gameState,
-            round=jsonRoom.currentRound,
-            players=players
+            id = jsonRoom.roomId,
+            state = jsonRoom.gameState,
+            round = jsonRoom.currentRound,
+            players = players
         );
         return r;
     }
 }
 
 function getRoomInfoAsJson(roomId) {
-    client.get(roomId, function (error, result) {
-        if (error) {
-            console.error(error);
-            return {};
-        }
-        console.log('GET result ->' + result);
-        return JSON.parse(result);
+    return new Promise((res, rej) => {
+        client.get(roomId, function (error, result) {
+            if (error) {
+                console.error(error);
+                rej({});
+            } else {
+                console.log('GET result ->' + result);
+                res(JSON.parse(result));
+            }
+        })
     })
 }
 
@@ -129,6 +132,6 @@ function saveRoom(roomObject) {
 module.exports = {
     Room: Room,
     getRoomInfoAsJson: getRoomInfoAsJson,
-    getRoomInfoAsObject:getRoomInfoAsObject,
+    getRoomInfoAsObject: getRoomInfoAsObject,
     saveRoom: saveRoom
 }

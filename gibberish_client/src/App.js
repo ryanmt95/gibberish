@@ -6,18 +6,28 @@ import LandingPage from './components/Joinroom/LandingPage';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import InvalidPage from './components/InvalidPage';
 
-function App() {
-  return (
-    <Router>
-      <div className="App">
-      <Switch>
-        <Route exact path="/room/:id" component={GameroomPage}/>
-        <Route exact path="/" component={LandingPage}/>
-        <Route exact path='*' component={InvalidPage}/>
-      </Switch>
-      </div>
-    </Router>
-  );
+class App extends React.Component {
+  state = {
+    nickname: 'hellopanda',
+  }
+
+  updateNickname = (nickname) => {
+    this.setState({nickname})
+  }
+
+  render() {
+    return (
+      <Router>
+        <div className="App">
+        <Switch>
+          <Route exact path="/room/:id"  render={props => <GameroomPage {...props} nickname={this.state.nickname} updateNickname={this.updateNickname}/>} />
+          <Route exact path="/" render={props => <LandingPage {...props} nickname={this.state.nickname} updateNickname={this.updateNickname} />}/>
+          <Route exact path='*' component={InvalidPage}/>
+        </Switch>
+        </div>
+      </Router>
+    );
+  }
 }
 
 export default App;

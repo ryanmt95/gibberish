@@ -8,29 +8,38 @@ import GameWaiting from './gamestates/GameWaiting'
 import RoomDetailComponent from './RoomDetailComponent'
 
 function QuestionCardComponent(props) {
-  const { roomId, currentRound, maxRounds, gamestate, roundScores, players, startNextRound, transitionToState, updateScores } = props
+  const { roomId, currentRound, maxRounds, gamestate, roundScores, players, startNextRound, transitionToState, updateScores, currentQuestion, currentAnswer, timeRemaining, setTimeRemaining  } = props
 
   let component
   if(gamestate === gamestates.ROUND_LOADING) {
     component = <RoundLoading 
                   transitionToState={transitionToState} 
-                  nextState={gamestates.ROUND_ONGOING}/>
+                  nextState={gamestates.ROUND_ONGOING}
+                  timeRemaining={timeRemaining}
+                  setTimeRemaining={setTimeRemaining}/>
   } else if(gamestate === gamestates.ROUND_ONGOING) {
     component = <RoundOngoing 
                   transitionToState={transitionToState} 
                   nextState={gamestates.ROUND_ENDED}
-                  updateScores={updateScores}/>
+                  updateScores={updateScores}
+                  currentQuestion={currentQuestion} 
+                  currentAnswer={currentAnswer} 
+                  timeRemaining={timeRemaining}
+                  setTimeRemaining={setTimeRemaining}/>
   } else if(gamestate === gamestates.ROUND_ENDED) {
     component = <RoundEnded 
                   transitionToState={transitionToState} 
                   nextState={gamestates.ROUND_LOADING}
                   startNextRound={startNextRound}
-                  roundScores={roundScores}/>
+                  roundScores={roundScores}
+                  timeRemaining={timeRemaining}
+                  setTimeRemaining={setTimeRemaining}
+                  currentAnswer={currentAnswer}/>
   } else if(gamestate === gamestates.GAME_ENDED) {
     component = <GameEnded players={players}/>
   } else if(gamestate === gamestates.GAME_WAITING) {
     component = <GameWaiting 
-                  transitionToState={transitionToState}
+                  transitionToState={transitionToState} 
                   nextState={gamestates.ROUND_LOADING}/>
   }
 

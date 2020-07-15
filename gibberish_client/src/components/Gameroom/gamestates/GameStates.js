@@ -1,7 +1,7 @@
 export const gamestates = {
-  GAME_WAITING: 'game_waiting',
-  ROUND_LOADING: 'round_loading',
-  ROUND_ONGOING: 'round_ongoing',
-  ROUND_ENDED: 'round_ended',
-  GAME_ENDED: 'game_ended'
+  GAME_WAITING: 'GAME_WAITING',
+  ROUND_LOADING: 'ROUND_LOADING',
+  ROUND_ONGOING: 'ROUND_ONGOING',
+  ROUND_ENDED: 'ROUND_ENDED',
+  GAME_ENDED: 'GAME_ENDED'
 }

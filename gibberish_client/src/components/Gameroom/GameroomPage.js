@@ -15,12 +15,7 @@ class GameroomPage extends React.Component {
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 1,
 			maxRounds: 5,
-			players: [
-				{name: this.props.nickname, points: 0},
-				{name: "gibberish gary", points: 0},
-				{name: "nonsensical nick", points: 0},
-				{name: "blah blah brenda ", points: 0},
-			],
+			players: [],
 			roundScores: [],
 			currentQuestion: '',
 			currentAnswer: '', 
@@ -35,7 +30,10 @@ class GameroomPage extends React.Component {
 		const {roomId} = this.state
 		API.get(`/room/${roomId}`)
 			.then(res => {
-				console.log(res.data)
+				const {roomId, gameState, currentRound, players} = res.data 
+				this.setState({
+					players: players,
+				gamestate: gameState})
 			})
 	}
 

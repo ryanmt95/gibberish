@@ -43,9 +43,12 @@ class RoomController {
 
     static startGame(req, res) {
         let roomId = req.body.roomId;
-        let r = roomModel.getRoomInfoAsObject(roomId);
-        r.start();
-        res.send(roomModel.saveRoom(r));
+        roomModel.getRoomInfoAsObject(roomId)
+            .then(room => {
+                room.start()
+                roomModel.saveRoom(room)
+                res.send(room)
+            })
     }
 
     static submitAnswer(req, res) {

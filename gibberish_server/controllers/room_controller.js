@@ -6,12 +6,6 @@ class RoomController {
     static getRoomData(req, res) {
         return roomModel.getRoomInfoAsObject(req.params["roomId"])
             .then(result => res.send(result))
-        // r.nextState();
-        // roomModel.saveRoom(r);
-        // return roomModel.getRoomInfoAsJson(req.params["roomId"])
-        // return r
-        console.log(r)
-        res.send('hi')
     }
 
     static async createNewRoom(req, res) {
@@ -29,16 +23,22 @@ class RoomController {
 
     static joinRoom(req, res) {
         // TODO: race conditionSTATE.GAME_WAITING
-        let r = roomModel.Room.deserializeRoom(roomModel.getRoomInfoAsJson(roomId));
-        if (r.state != STATE.GAME_WAITING) return "";
-        for (let p in r.players) {
-            if (p.name == nickname) {
-                return "";
-            }
-        }
-        r.players.push(new Player(nickname))
-        roomModel.saveRoom(r, client);
-        res.sen(r.players[r.length - 1].name);
+        const nickname = req.body.nickname
+        const roomId = req.body.roomId
+        roomModel.getRoomInfoAsJson(roomId)
+            .then(result => {
+                let r = roomModel.Room.deserializeRoom(result)
+                if (r.state != roomModel.STATE.GAME_WAITING) return "";
+                for (let p in r.players) {
+                    if (p.name == nickname) {
+                        return "";
+                    }
+                }
+                r.addPlayer(nickname)
+                roomModel.saveRoom(r);
+                res.send(r);
+            })
+        
     }
 
     static startGame(req, res) {

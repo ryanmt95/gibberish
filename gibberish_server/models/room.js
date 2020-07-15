@@ -38,7 +38,8 @@ class Room {
     toJSON() {
         let players = []
         for (let player of this.players) {
-            players.push(player.toJSON());
+            console.log(player)
+            players.push(player);
         }
         return {
             roomId: this.id,
@@ -95,8 +96,9 @@ class Room {
     static deserializeRoom(jsonRoom) {
         let players = [];
         for (let player of jsonRoom.players) {
-            const p = Player.deserializePlayer(JSON.parse(player))
-            players.push(p);
+            console.log(player)
+            // const p = Player.deserializePlayer(JSON.parse(player))
+            players.push(player);
         }
         let r = new Room(jsonRoom.roomId,jsonRoom.gameState,jsonRoom.currentRound,players);
         return r;
@@ -132,5 +134,6 @@ module.exports = {
     Room: Room,
     getRoomInfoAsJson: getRoomInfoAsJson,
     getRoomInfoAsObject: getRoomInfoAsObject,
-    saveRoom: saveRoom
+    saveRoom: saveRoom,
+    STATE: STATE
 }

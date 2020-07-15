@@ -68,10 +68,13 @@ class LandingPage extends React.Component {
 	}
 
 
-    joinRoom = () => {
+    joinRoom = nickname => {
         // console.log('joinRoom')
         const { roomCode } = this.state;
-        this.props.history.push(`room/${roomCode}`);
+        API.post('/join_room', {nickname: nickname, roomId: roomCode})
+            .then(res => {
+            this.props.history.push(`room/${roomCode}`);
+        })
     }
 
 	render() {

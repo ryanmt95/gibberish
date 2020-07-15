@@ -1,5 +1,6 @@
 const uid = require("uid");
 const Player = require("../models/player")
+const questions = require('../sample_questions')
 
 const redis = require("redis");
 let port = 6379
@@ -27,12 +28,22 @@ const ROUND_NUMBER = 10;
 Object.freeze(ROUND_NUMBER);
 
 class Room {
-    constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = []) {
+    constructor(id = uid(), state = STATE.GAME_WAITING, round = 1, players = [], startedTime = null, qna = this.generateQuestions()) {
         this.id = id;
         this.state = state;
         this.round = round;
         this.players = players;
-        this.startedTime = null;
+        this.startedTime = startedTime;
+        this.qna = qna
+    }
+
+    generateQuestions() {
+        let qna = []
+        for(var i = 0; i < ROUND_NUMBER; i++) {
+            const r = Math.floor(Math.random() * questions.length)
+            qna.push(questions[r])
+        }
+        return qna
     }
 
     toJSON() {
@@ -45,6 +56,9 @@ class Room {
             gameState: this.state,
             currentRound: this.round,
             players: players,
+            startedTime: this.startedTime,
+            qna: this.qna,
+            timer: Math.floor((new Date() - new Date(this.startedTime))/1000)
         };
     }
 
@@ -57,26 +71,31 @@ class Room {
 
     nextState() {
         let now = new Date();
+        let startTime = new Date(this.startedTime)
+        console.log(Math.round((now - startTime)/1000))
         switch (this.state) {
             case STATE.GAME_WAITING:
                 break;
             case STATE.ROUND_LOADING:
-                if (now - this.startedTime >= 3000) {
+                if (now - startTime >= 3000) {
+                    console.log('transition to ongoing')
                     this.state = STATE.ROUND_ONGOING;
                     this.startedTime = now;
                 }
                 break;
             case STATE.ROUND_ONGOING:
-                if (now - this.startedTime >= 10000) {
+                if (now - startTime >= 10000) {
+                    console.log('transition to ended')
                     this.state = STATE.ROUND_ENDED;
                     this.startedTime = now;
                 }
                 break;
             case STATE.ROUND_ENDED:
-                if (now - this.startedTime >= 5000) {
+                if (now - startTime >= 5000) {
                     if (this.round < ROUND_NUMBER) {
                         this.state = STATE.ROUND_LOADING;
                         this.startedTime = now;
+                        this.round ++
                     } else {
                         this.state = STATE.GAME_ENDED;
                     }
@@ -98,7 +117,7 @@ class Room {
             // const p = Player.deserializePlayer(JSON.parse(player))
             players.push(player);
         }
-        let r = new Room(jsonRoom.roomId,jsonRoom.gameState,jsonRoom.currentRound,players);
+        let r = new Room(jsonRoom.roomId,jsonRoom.gameState,jsonRoom.currentRound,players, jsonRoom.startedTime, jsonRoom.qna);
         return r;
     }
 }

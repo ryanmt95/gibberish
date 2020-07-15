@@ -17,6 +17,7 @@ class GameroomPage extends React.Component {
 			maxRounds: 5,
 			players: [],
 			roundScores: [],
+			qna: [],
 			currentQuestion: '',
 			currentAnswer: '', 
 			userAnswer: '',
@@ -38,10 +39,21 @@ class GameroomPage extends React.Component {
 	getRoomData(roomId) {
 		API.get(`/room/${roomId}`)
 			.then(res => {
-				const {roomId, gameState, currentRound, players} = res.data 
+				const {roomId, gameState, currentRound, players, timer, qna} = res.data 
+				let timeleft
+				if(gameState == gamestates.ROUND_LOADING) {
+					timeleft = 3-timer
+				} else if(gameState == gamestates.ROUND_ONGOING) {
+					timeleft = 10 - timer
+				} else if(gameState == gamestates.ROUND_ENDED) {
+					timeleft = 5 - timer
+				}
 				this.setState({
 					players: players,
-					gamestate: gameState})
+					gamestate: gameState, 
+					currentRound: currentRound,
+					timeRemaining: timeleft, 
+					qna: qna})
 			})
 	}
 
@@ -128,7 +140,7 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const { roomId, gamestate, currentRound, maxRounds, players, roundScores, currentQuestion, currentAnswer, userAnswer, timeRemaining, helpText } = this.state
+		const { roomId, gamestate, currentRound, maxRounds, players, roundScores, qna, userAnswer, timeRemaining, helpText } = this.state
 		const { nickname } = this.props
 		return (
 			<div className="container">
@@ -145,8 +157,8 @@ class GameroomPage extends React.Component {
 								startNextRound={this.startNextRound}
 								transitionToState={this.transitionToState}
 								updateScores={this.updateScores}
-								currentQuestion={currentQuestion}
-								currentAnswer={currentAnswer}
+								currentQuestion={qna.length == 0 ? '' : qna[currentRound]['question']}
+								currentAnswer={qna.length == 0 ? '' : qna[currentRound]['answer']}
 								timeRemaining={timeRemaining}
 								setTimeRemaining={this.setTimeRemaining}/>
 						</div>

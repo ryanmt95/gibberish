@@ -3,9 +3,13 @@ const roomModel = require("../models/Room")
 
 
 class RoomController {
-    static getRoomData(req, res) {
+    static async getRoomData(req, res) {
         return roomModel.getRoomInfoAsObject(req.params["roomId"])
-            .then(result => res.send(result))
+            .then(result => {
+                result.nextState()
+                roomModel.saveRoom(result)
+                res.send(result)
+            })
     }
 
     static async createNewRoom(req, res) {

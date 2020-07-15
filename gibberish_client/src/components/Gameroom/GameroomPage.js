@@ -38,26 +38,37 @@ class GameroomPage extends React.Component {
 	getRoomData(roomId) {
 		API.get(`/room/${roomId}`)
 			.then(res => {
-				const {roomId, gameState, currentRound, players, timer, qna} = res.data 
-				let timeleft
-				if(gameState == gamestates.ROUND_LOADING) {
-					timeleft = 3-timer
-				} else if(gameState == gamestates.ROUND_ONGOING) {
-					timeleft = 10 - timer
-				} else if(gameState == gamestates.ROUND_ENDED) {
-					timeleft = 5 - timer
-				}
-				this.setState({
-					players: players,
-					gamestate: gameState, 
-					currentRound: currentRound,
-					timeRemaining: timeleft, 
-					qna: qna})
+				this.parseRoomData(res.data)
 			})
 	}
 
-	setTimeRemaining = (time) => {
-		this.setState({timeRemaining: time})
+	parseRoomData(data) {
+		const {roomId, gameState, currentRound, players, timer, qna} = data 
+		let timeleft
+		if(gameState == gamestates.ROUND_LOADING) {
+			timeleft = 3-timer
+		} else if(gameState == gamestates.ROUND_ONGOING) {
+			timeleft = 10 - timer
+		} else if(gameState == gamestates.ROUND_ENDED) {
+			timeleft = 5 - timer
+		}
+		const playersSorted = players.sort((a,b) => {
+			if(a.totalScore < b.totalScore) {
+				return 1
+			} else if(a.totalScore > b.totalScore) {
+				return -1
+			} else {
+				return a.playerName < b.playerName ? 1 : -1
+			}
+		})
+
+		this.setState({
+			players: playersSorted,
+			gamestate: gameState, 
+			currentRound: currentRound,
+			timeRemaining: timeleft, 
+			qna: qna
+		})
 	}
 
 	getQuestion = () => {
@@ -70,24 +81,20 @@ class GameroomPage extends React.Component {
 		this.setState({currentQuestion: qna['question'], currentAnswer: qna['answer']})
 	}
 
-	getRoomDetails = () => {
-		API.get('/room/' + this.state.roomId)
-		.then(res => {
-			this.setState({ 
-				gamestate: res.data.gameState, 
-				currentRound: res.data.currentRound, 
-				players: res.data.players
-			})
-		})
-	}
-
 	submitAnswer = e => {
 		e.preventDefault()
-		const {currentAnswer, userAnswer, timeRemaining} = this.state
+		const { userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
+		const currentAnswer = qna[currentRound-1]['answer']
 		if(currentAnswer === userAnswer) {
 			this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
-				this.transitionToState(gamestates.ROUND_ENDED)
-				this.updateScores(timeRemaining)
+				API.post('/submit_answer', {
+					roomId: roomId,
+					nickname: this.props.nickname,
+					score: timeRemaining
+				}).then(res => {
+					console.log(res.data)
+					this.parseRoomData(res.data)
+				})
 			})
 			// API.post('/submit_answer', {
 			// 	roomId: roomId, 

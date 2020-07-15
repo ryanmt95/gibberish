@@ -42,7 +42,6 @@ class RoomController {
                 roomModel.saveRoom(r);
                 res.send(r);
             })
-        
     }
 
     static startGame(req, res) {
@@ -58,14 +57,18 @@ class RoomController {
     static submitAnswer(req, res) {
         let roomId = req.body.roomId;
         let nickname = req.body.nickname;
-        let r = roomModel.getRoomInfoAsObject(roomId);
-        let score = new Date() - r.startedTime;
-        for (let p in r.playes) {
-            if (p.name == nickname) {
-                p.updateScore(score);
-                return
-            }
-        }
+        let score = req.body.score;
+        console.log(nickname)
+        roomModel.getRoomInfoAsObject(roomId)
+            .then(room => {
+                let index = room.players.findIndex(player => player.playerName === nickname)
+                if(index !== -1) {
+                    room.players[index]['totalScore'] += score
+                    room.players[index]['lastScore'] = score
+                }
+                roomModel.saveRoom(room)
+                res.send(room)
+            })
     }
 }
 module.exports = RoomController;

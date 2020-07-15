@@ -38,7 +38,6 @@ class Room {
     toJSON() {
         let players = []
         for (let player of this.players) {
-            console.log(player)
             players.push(player);
         }
         return {
@@ -96,7 +95,6 @@ class Room {
     static deserializeRoom(jsonRoom) {
         let players = [];
         for (let player of jsonRoom.players) {
-            console.log(player)
             // const p = Player.deserializePlayer(JSON.parse(player))
             players.push(player);
         }

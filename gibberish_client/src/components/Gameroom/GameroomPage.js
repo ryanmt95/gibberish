@@ -21,19 +21,27 @@ class GameroomPage extends React.Component {
 			currentAnswer: '', 
 			userAnswer: '',
 			timeRemaining: 0,
-			helpText: ''
+			helpText: '',
 		}
 	}
 
 	componentDidMount() {
 		this.getQuestion();
 		const {roomId} = this.state
+		this.timer = setInterval(() => this.getRoomData(roomId), 1000)
+	}
+
+	componentWillUnmount() {
+		this.timer = null
+	}
+
+	getRoomData(roomId) {
 		API.get(`/room/${roomId}`)
 			.then(res => {
 				const {roomId, gameState, currentRound, players} = res.data 
 				this.setState({
 					players: players,
-				gamestate: gameState})
+					gamestate: gameState})
 			})
 	}
 

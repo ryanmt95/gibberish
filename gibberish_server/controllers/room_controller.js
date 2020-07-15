@@ -4,10 +4,14 @@ const roomModel = require("../models/Room")
 
 class RoomController {
     static getRoomData(req, res) {
-        let r = roomModel.getRoomInfoAsObject(req.params["roomId"]);
-        r.nextState();
-        roomModel.saveRoom(r);
-        return roomModel.getRoomInfoAsJson(req.params["roomId"])
+        return roomModel.getRoomInfoAsObject(req.params["roomId"])
+            .then(result => res.send(result))
+        // r.nextState();
+        // roomModel.saveRoom(r);
+        // return roomModel.getRoomInfoAsJson(req.params["roomId"])
+        // return r
+        console.log(r)
+        res.send('hi')
     }
 
     static async createNewRoom(req, res) {

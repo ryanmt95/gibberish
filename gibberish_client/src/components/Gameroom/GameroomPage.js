@@ -35,7 +35,7 @@ class GameroomPage extends React.Component {
 		const {roomId} = this.state
 		API.get(`/room/${roomId}`)
 			.then(res => {
-				console.log(res)
+				console.log(res.data)
 			})
 	}
 

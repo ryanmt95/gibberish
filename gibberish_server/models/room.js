@@ -38,7 +38,7 @@ class Room {
     toJSON() {
         let players = []
         for (let player of this.players) {
-            players.push(JSON.stringify(player));
+            players.push(player.toJSON());
         }
         return {
             roomId: this.id,
@@ -87,21 +87,18 @@ class Room {
         }
     }
 
-    addPlayer(newPlayer) {
-        this.players.push(newPlayer);
+    addPlayer(nickname) {
+        const player = new Player(nickname).toJSON()
+        this.players.push(player);
     }
 
     static deserializeRoom(jsonRoom) {
         let players = [];
         for (let player of jsonRoom.players) {
-            players.push(Player.deserializePlayer(JSON.parse(player)));
+            const p = Player.deserializePlayer(JSON.parse(player))
+            players.push(p);
         }
-        let r = new Room(
-            id = jsonRoom.roomId,
-            state = jsonRoom.gameState,
-            round = jsonRoom.currentRound,
-            players = players
-        );
+        let r = new Room(jsonRoom.roomId,jsonRoom.gameState,jsonRoom.currentRound,players);
         return r;
     }
 }
@@ -121,7 +118,9 @@ function getRoomInfoAsJson(roomId) {
 }
 
 function getRoomInfoAsObject(roomId) {
-    return Room.deserializeRoom(getRoomInfoAsJson(roomId));
+    return getRoomInfoAsJson(roomId).then(room => {
+        return Room.deserializeRoom(room)
+    })
 }
 
 function saveRoom(roomObject) {

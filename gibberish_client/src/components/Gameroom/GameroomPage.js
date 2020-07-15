@@ -32,6 +32,11 @@ class GameroomPage extends React.Component {
 
 	componentDidMount() {
 		this.getQuestion();
+		const {roomId} = this.state
+		API.get(`/room/${roomId}`)
+			.then(res => {
+				console.log(res)
+			})
 	}
 
 	setTimeRemaining = (time) => {

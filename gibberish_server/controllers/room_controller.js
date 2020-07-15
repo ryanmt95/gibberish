@@ -14,7 +14,6 @@ class RoomController {
 
     static async createNewRoom(req, res) {
         let r = new roomModel.Room();
-        r.addPlayer(req.body.nickname)
         roomModel.saveRoom(r);
         roomModel.getRoomInfoAsJson(r.id)
             .then(result => {

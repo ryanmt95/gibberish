@@ -107,7 +107,7 @@ class Room {
     }
 
     addPlayer(nickname) {
-        const player = new Player(nickname).toJSON()
+        const player = new Player(nickname)
         this.players.push(player);
     }
 

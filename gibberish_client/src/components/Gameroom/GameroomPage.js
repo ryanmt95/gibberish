@@ -14,7 +14,6 @@ class GameroomPage extends React.Component {
 			roomId: props.match.params.id,
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 1,
-			maxRounds: 5,
 			players: [],
 			roundScores: [],
 			qna: [],
@@ -150,17 +149,13 @@ class GameroomPage extends React.Component {
 							<QuestionCardComponent 
 								roomId={roomId}
 								currentRound={currentRound}
-								maxRounds={maxRounds}
 								gamestate={gamestate}
-								roundScores={roundScores}
 								players={players}
 								startNextRound={this.startNextRound}
 								transitionToState={this.transitionToState}
 								updateScores={this.updateScores}
-								currentQuestion={qna.length == 0 ? '' : qna[currentRound]['question']}
-								currentAnswer={qna.length == 0 ? '' : qna[currentRound]['answer']}
-								timeRemaining={timeRemaining}
-								setTimeRemaining={this.setTimeRemaining}/>
+								qna={qna}
+								timeRemaining={timeRemaining}/>
 						</div>
 					</div>
 

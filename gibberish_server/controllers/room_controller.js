@@ -11,12 +11,18 @@ class RoomController {
                 roomModel.saveRoom(result)
                 res.json({id, state, round, players, timer})
             })
+            .catch(error => {
+                res.status(400).send(error)
+            })
     }
 
     static async getRoomQna(req, res) {
         roomModel.getRoomInfoAsObject(req.params['roomId'])
             .then(result => {
                 res.json({qna: result.qna})
+            })
+            .catch(error => {
+                res.status(400).send(error)
             })
     }
 
@@ -47,6 +53,9 @@ class RoomController {
                 roomModel.saveRoom(room)
                 res.json(room)
             })
+            .catch(error => {
+                res.status(400).send(error)
+            })
     }
 
     static startGame(req, res) {
@@ -56,6 +65,9 @@ class RoomController {
                 room.start()
                 roomModel.saveRoom(room)
                 res.json(room)
+            })
+            .catch(error => {
+                res.status(400).send(error)
             })
     }
 
@@ -73,6 +85,9 @@ class RoomController {
                 }
                 roomModel.saveRoom(room)
                 res.json(room)
+            })
+            .catch(error => {
+                res.status(400).send(error)
             })
     }
 }

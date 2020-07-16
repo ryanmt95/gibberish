@@ -1,5 +1,5 @@
 const Player = require("../models/player")
-const roomModel = require("../models/Room")
+const roomModel = require("../models/room")
 
 
 class RoomController {

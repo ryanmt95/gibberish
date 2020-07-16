@@ -4,11 +4,19 @@ const roomModel = require("../models/Room")
 
 class RoomController {
     static async getRoomData(req, res) {
-        return roomModel.getRoomInfoAsObject(req.params["roomId"])
+        roomModel.getRoomInfoAsObject(req.params["roomId"])
             .then(result => {
+                const {id, state, round, players, timer} = result
                 result.nextState()
                 roomModel.saveRoom(result)
-                res.send(result)
+                res.json({id, state, round, players, timer})
+            })
+    }
+
+    static async getRoomQna(req, res) {
+        roomModel.getRoomInfoAsObject(req.params['roomId'])
+            .then(result => {
+                res.json({qna: result.qna})
             })
     }
 
@@ -17,7 +25,7 @@ class RoomController {
         roomModel.saveRoom(r);
         roomModel.getRoomInfoAsJson(r.id)
             .then(result => {
-                res.send(result);
+                res.json(result);
             })
             .catch(error => {
                 res.status(404).send(error);
@@ -28,18 +36,16 @@ class RoomController {
         // TODO: race conditionSTATE.GAME_WAITING
         const nickname = req.body.nickname
         const roomId = req.body.roomId
-        roomModel.getRoomInfoAsJson(roomId)
-            .then(result => {
-                let r = roomModel.Room.deserializeRoom(result)
-                if (r.state != roomModel.STATE.GAME_WAITING) return "";
-                for (let p in r.players) {
-                    if (p.name == nickname) {
-                        return "";
-                    }
+        roomModel.getRoomInfoAsObject(roomId)
+            .then(room => {
+                if(room.state != roomModel.STATE.GAME_WAITING) res.status(400).send('Game has started')
+                const index = room.players.findIndex(player => player.playerName == nickname)
+                if(index !== -1) {
+                    res.status(400).send('Nickname already exists. Please choose another nickname!')
                 }
-                r.addPlayer(nickname)
-                roomModel.saveRoom(r);
-                res.send(r);
+                room.addPlayer(nickname)
+                roomModel.saveRoom(room)
+                res.json(room)
             })
     }
 
@@ -49,7 +55,7 @@ class RoomController {
             .then(room => {
                 room.start()
                 roomModel.saveRoom(room)
-                res.send(room)
+                res.json(room)
             })
     }
 
@@ -66,7 +72,7 @@ class RoomController {
                     room.players[index]['lastScore'] = score
                 }
                 roomModel.saveRoom(room)
-                res.send(room)
+                res.json(room)
             })
     }
 }

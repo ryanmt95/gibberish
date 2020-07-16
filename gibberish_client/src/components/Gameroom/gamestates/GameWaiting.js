@@ -10,7 +10,7 @@ function startGame(roomId) {
 }
 
 function GameWaiting(props) {
-  const {nextState, transitionToState, roomId} = props
+  const {roomId} = props
   return(
     <div>
       <h5>Waiting for more players to join...</h5>

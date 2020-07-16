@@ -35,6 +35,7 @@ class Room {
         this.players = players;
         this.startedTime = startedTime;
         this.qna = qna
+        this.timer = Math.floor((new Date() - new Date(this.startedTime))/1000)
     }
 
     generateQuestions() {
@@ -58,7 +59,7 @@ class Room {
             players: players,
             startedTime: this.startedTime,
             qna: this.qna,
-            timer: Math.floor((new Date() - new Date(this.startedTime))/1000)
+            timer: this.timer
         };
     }
 
@@ -72,26 +73,28 @@ class Room {
     nextState() {
         let now = new Date();
         let startTime = new Date(this.startedTime)
-        console.log(Math.round((now - startTime)/1000))
+        console.log(Math.floor((now - startTime)/1000))
         switch (this.state) {
             case STATE.GAME_WAITING:
                 break;
             case STATE.ROUND_LOADING:
-                if (now - startTime >= 3000) {
-                    console.log('transition to ongoing')
+                if (now - startTime > 3000) {
                     this.state = STATE.ROUND_ONGOING;
                     this.startedTime = now;
                 }
                 break;
             case STATE.ROUND_ONGOING:
-                if (now - startTime >= 10000) {
-                    console.log('transition to ended')
+                if (now - startTime > 10000) {
                     this.state = STATE.ROUND_ENDED;
                     this.startedTime = now;
                 }
                 break;
             case STATE.ROUND_ENDED:
-                if (now - startTime >= 5000) {
+                if (now - startTime > 5000) {
+                    // reset last score
+                    for(var i = 0; i < this.players.length; i++) {
+                        this.players[i]['lastScore'] = 0
+                    }
                     if (this.round < ROUND_NUMBER) {
                         this.state = STATE.ROUND_LOADING;
                         this.startedTime = now;
@@ -129,7 +132,7 @@ function getRoomInfoAsJson(roomId) {
                 console.error(error);
                 rej({});
             } else {
-                console.log('GET result ->' + result);
+                // console.log('GET result ->' + result);
                 res(JSON.parse(result));
             }
         })

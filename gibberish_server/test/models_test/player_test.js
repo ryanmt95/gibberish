@@ -24,4 +24,10 @@ describe('Test of player model', function () {
             assert.deepEqual(player1, player2);
         });
     });
+
+    describe('deserializePlayer(jsonPlayer)', function () {
+        it('should return the correct object given a json value', function () {
+            assert.deepEqual(Player.deserializePlayer(jsonOfPlayer2), player2);
+        });
+    });
 });

@@ -39,10 +39,10 @@ class Room {
     }
 
     generateQuestions() {
-        let qna = []
-        for(var i = 0; i < ROUND_NUMBER; i++) {
+        let qna = new Set()
+        while(qna.size < ROUND_NUMBER) {
             const r = Math.floor(Math.random() * questions.length)
-            qna.push(questions[r])
+            qna.add(questions[r])
         }
         return qna
     }

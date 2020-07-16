@@ -59,14 +59,20 @@ class LandingPage extends React.Component {
             .then(res => {
                 this.joinRoom(nickname, res.data.roomId)
             })
+            .catch(err => {
+                err.response ? alert(err.response.data) : alert(err)
+            })
 	}
 
 
     joinRoom = (nickname, roomCode) => {
         API.post('/join_room', {nickname: nickname, roomId: roomCode})
             .then(res => {
-            this.props.history.push(`room/${roomCode}`);
-        })
+                this.props.history.push(`room/${roomCode}`);
+            })
+            .catch(err => {
+                err.response ? alert(err.response.data) : alert(err)
+            })
     }
 
 	render() {

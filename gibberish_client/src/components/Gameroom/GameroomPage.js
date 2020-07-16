@@ -17,12 +17,13 @@ class GameroomPage extends React.Component {
 		this.state = {
 			roomId: props.match.params.id,
 			gamestate: gamestates.GAME_WAITING,
-			currentRound: 1,
+			currentRound: 0,
 			players: [],
 			qna: [],
 			userAnswer: '',
 			timeRemaining: 0,
 			helpText: '',
+			userAnswered: false
 		}
 	}
 
@@ -53,13 +54,21 @@ class GameroomPage extends React.Component {
 	parseRoomData(data) {
 		const { state, round, players, timer } = data 
 		let timeleft
+		let { helpText, userAnswered } = this.state
 		if(state === gamestates.ROUND_LOADING) {
 			timeleft = ROUND_LOADING_TIME - timer
+			helpText = ''
+			userAnswered = false
 		} else if(state === gamestates.ROUND_ONGOING) {
 			timeleft = ROUND_ONGOING_TIME - timer
 		} else if(state === gamestates.ROUND_ENDED) {
 			timeleft = ROUND_ENDED_TIME - timer
+			helpText = ''
+			userAnswered = true
+		} else if(state === gamestates.GAME_ENDED) {
+			clearInterval(this.timer)
 		}
+		// sort players by totalScore, then name
 		const playersSorted = players.sort((a,b) => {
 			if(a.totalScore < b.totalScore) {
 				return 1
@@ -69,32 +78,37 @@ class GameroomPage extends React.Component {
 				return a.playerName < b.playerName ? 1 : -1
 			}
 		})
-
 		this.setState({
 			players: playersSorted,
 			gamestate: state, 
 			currentRound: round,
-			timeRemaining: timeleft
+			timeRemaining: timeleft,
+			helpText: helpText,
+			userAnswered: userAnswered
 		})
 	}
 
 	submitAnswer = e => {
 		e.preventDefault()
-		const { userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
-		const currentAnswer = qna[currentRound-1]['answer']
-		if(currentAnswer === userAnswer) {
-			this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
-				API.post('/submit_answer', {
-					roomId: roomId,
-					nickname: this.props.nickname,
-					score: timeRemaining
-				}).then(res => {
-					console.log(res.data)
-					this.parseRoomData(res.data)
+		const { gamestate } = this.state
+		if(gamestate === gamestates.ROUND_ONGOING) {
+			const { userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
+			const currentAnswer = qna[currentRound-1]['answer']
+			if(currentAnswer === userAnswer) {
+				this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
+					API.post('/submit_answer', {
+						roomId: roomId,
+						nickname: this.props.nickname,
+						score: timeRemaining
+					}).then(res => {
+						this.setState({userAnswered: true}, () => this.parseRoomData(res.data))
+					}).catch(err => {
+						alert(err)
+					})
 				})
-			})
-		} else {
-			this.setState({helpText: 'Please try again!', userAnswer: ''})
+			} else {
+				this.setState({helpText: 'Please try again!', userAnswer: ''})
+			}
 		}
 	}
 
@@ -103,7 +117,7 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const { roomId, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText } = this.state
+		const { roomId, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
 		const { nickname } = this.props
 		return (
 			<div className="container">
@@ -136,6 +150,7 @@ class GameroomPage extends React.Component {
 								gamestate={gamestate}
 								userAnswer={userAnswer}
 								helpText={helpText}
+								userAnswered={userAnswered}
 								onAnswerFieldChanged={this.onAnswerFieldChanged}
 								submitAnswer={this.submitAnswer}/>
 						</div>

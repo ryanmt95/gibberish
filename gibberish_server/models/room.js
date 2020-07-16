@@ -28,7 +28,7 @@ const ROUND_NUMBER = 10;
 Object.freeze(ROUND_NUMBER);
 
 class Room {
-    constructor(id = uid(), state = STATE.GAME_WAITING, round = 1, players = [], startedTime = null, qna = this.generateQuestions()) {
+    constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = [], startedTime = null, qna = this.generateQuestions()) {
         this.id = id;
         this.state = state;
         this.round = round;
@@ -67,13 +67,13 @@ class Room {
         if (this.state == STATE.GAME_WAITING) {
             this.state = STATE.ROUND_LOADING;
             this.startedTime = new Date();
+            this.round++
         }
     }
 
     nextState() {
         let now = new Date();
         let startTime = new Date(this.startedTime)
-        console.log(Math.floor((now - startTime)/1000))
         switch (this.state) {
             case STATE.GAME_WAITING:
                 break;
@@ -117,8 +117,8 @@ class Room {
     static deserializeRoom(jsonRoom) {
         let players = [];
         for (let player of jsonRoom.players) {
-            // const p = Player.deserializePlayer(JSON.parse(player))
-            players.push(player);
+            const p = Player.deserializePlayer(player)
+            players.push(p); // convert to player
         }
         let r = new Room(jsonRoom.roomId,jsonRoom.gameState,jsonRoom.currentRound,players, jsonRoom.startedTime, jsonRoom.qna);
         return r;

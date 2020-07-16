@@ -75,16 +75,15 @@ class RoomController {
         let roomId = req.body.roomId;
         let nickname = req.body.nickname;
         let score = req.body.score;
-        console.log(nickname)
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
-                let index = room.players.findIndex(player => player.playerName === nickname)
+                let index = room.players.findIndex(player => player.name === nickname)
                 if(index !== -1) {
-                    room.players[index]['totalScore'] += score
-                    room.players[index]['lastScore'] = score
+                    room.players[index].updateScore(score)
                 }
                 roomModel.saveRoom(room)
-                res.json(room)
+                const {id, state, round, players, timer} = room
+                res.json({id, state, round, players, timer})
             })
             .catch(error => {
                 res.status(400).send(error)

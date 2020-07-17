@@ -44,7 +44,7 @@ class Room {
             const r = Math.floor(Math.random() * questions.length)
             qna.add(questions[r])
         }
-        return qna
+        return Array.from(qna)
     }
 
     toJSON() {

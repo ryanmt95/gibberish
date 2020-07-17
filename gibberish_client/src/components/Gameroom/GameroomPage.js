@@ -94,7 +94,7 @@ class GameroomPage extends React.Component {
 		if(gamestate === gamestates.ROUND_ONGOING) {
 			const { userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
 			const currentAnswer = qna[currentRound-1]['answer']
-			if(currentAnswer === userAnswer) {
+			if(currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
 				this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
 					API.post('/submit_answer', {
 						roomId: roomId,

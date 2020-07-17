@@ -2,11 +2,8 @@ import React from 'react'
 import api from '../../../api/api'
 
 function startGame(roomId) {
-  console.log(roomId)
   api.post('/start_game', { roomId: roomId })
-  .then(res => {
-    console.log(res)
-  })
+    .catch(err => alert(err))
 }
 
 function GameWaiting(props) {

@@ -9,7 +9,7 @@ const questions = [
     },
     {
         question: "reef idge her ate her",
-        answer: "refridgerator"
+        answer: "refrigerator"
     },
     {
         question: "is bunch pops queer pans",

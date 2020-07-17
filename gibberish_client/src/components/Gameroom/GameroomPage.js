@@ -90,8 +90,8 @@ class GameroomPage extends React.Component {
 
 	submitAnswer = e => {
 		e.preventDefault()
-		const { gamestate } = this.state
-		if(gamestate === gamestates.ROUND_ONGOING) {
+		const { gamestate, userAnswered } = this.state
+		if(gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
 			const { userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
 			const currentAnswer = qna[currentRound-1]['answer']
 			if(currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {

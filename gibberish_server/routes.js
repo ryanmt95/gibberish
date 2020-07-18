@@ -9,4 +9,5 @@ module.exports = (app) => {
     app.post('/join_room', RoomController.joinRoom);
     app.post('/start_game', RoomController.startGame);
     app.post('/submit_answer', RoomController.submitAnswer);
+    app.post('/restart_game', RoomController.restartGame)
 }

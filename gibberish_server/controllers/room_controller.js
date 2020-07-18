@@ -89,5 +89,18 @@ class RoomController {
                 res.status(400).send(error)
             })
     }
+
+    static restartGame(req, res) {
+        let roomId = req.body.roomId;
+        roomModel.getRoomInfoAsObject(roomId)
+            .then(room => {
+                room.restart()
+                roomModel.saveRoom(room)
+                res.json(room)
+            })
+            .catch(error => {
+                res.status(400).send(error)
+            })
+    }
 }
 module.exports = RoomController;

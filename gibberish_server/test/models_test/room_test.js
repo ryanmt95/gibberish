@@ -99,11 +99,6 @@ function delay(fn, t) {
                 schedule(fn, t);
             }
             return self;
-        },
-        cancel: function () {
-            clearTimeout(timer);
-            queue = [];
-            return self;
         }
     };
     return self.delay(fn, t);

@@ -142,8 +142,8 @@ function getRoomInfoAsObject(roomId) {
 }
 
 function saveRoom(roomObject) {
-    return client.set(roomObject.id, JSON.stringify(roomObject), redis.print);
-    // return roomObject.id;
+    client.set(roomObject.id, JSON.stringify(roomObject), redis.print);
+    return roomObject.id;
 }
 
 module.exports = {

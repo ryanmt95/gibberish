@@ -116,6 +116,19 @@ class GameroomPage extends React.Component {
 		this.setState({ userAnswer: event.target.value})
 	}
 
+	handlePlayAgain = e => {
+		e.preventDefault()
+		const {roomId} = this.state
+		API.post('/restart_game', {
+			roomId: roomId
+		}).then(res => {
+			this.getRoomQna(roomId)
+			this.timer = setInterval(() => this.getRoomData(roomId), 500)
+		}).catch(err => {
+			alert(err)
+		})
+	}
+
 	render() {
 		const { roomId, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
 		const { nickname } = this.props
@@ -152,7 +165,8 @@ class GameroomPage extends React.Component {
 								helpText={helpText}
 								userAnswered={userAnswered}
 								onAnswerFieldChanged={this.onAnswerFieldChanged}
-								submitAnswer={this.submitAnswer}/>
+								submitAnswer={this.submitAnswer}
+								handlePlayAgain={this.handlePlayAgain}/>
 						</div>
 					</div>
 				</div>

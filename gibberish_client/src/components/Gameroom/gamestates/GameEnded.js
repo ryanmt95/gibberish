@@ -13,17 +13,17 @@ function GameEnded(props) {
         {players.length > 1 ? (
           <div>
             <img id="star_silver" src={star_silver} alt="star_silver"/>
-            <h5>{players[1].playerName}</h5>
+            <h5>{players[1].name}</h5>
           </div>
         ) : (null)}
         <div>
           <img id="star_gold" src={star_gold} alt="star_gold"/>
-          <h5>{players[0].playerName}</h5>
+          <h5>{players[0].name}</h5>
         </div>
         {players.length > 2 ? (
           <div>
             <img id="star_bronze" src={star_bronze} alt="star_bronze"/>
-            <h5>{players[2].playerName}</h5>
+            <h5>{players[2].name}</h5>
           </div>
         ) : (null)}
       </div>

@@ -6,9 +6,11 @@ class RoomController {
     static async getRoomData(req, res) {
         roomModel.getRoomInfoAsObject(req.params["roomId"])
             .then(result => {
-                const {id, state, round, players, timer} = result
+                const nickname = req.params["playerId"]
+                result.updatePlayers(nickname)
                 result.nextState()
                 roomModel.saveRoom(result)
+                const {id, state, round, players, timer} = result
                 res.json({id, state, round, players, timer})
             })
             .catch(error => {
@@ -45,7 +47,7 @@ class RoomController {
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
                 if(room.state != roomModel.STATE.GAME_WAITING) res.status(400).send('Game has started')
-                const index = room.players.findIndex(player => player.playerName == nickname)
+                const index = room.players.findIndex(player => player.name == nickname)
                 if(index !== -1) {
                     res.status(400).send('Nickname already exists. Please choose another nickname!')
                 }

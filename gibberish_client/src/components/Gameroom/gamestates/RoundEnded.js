@@ -9,7 +9,7 @@ function RoundEnded(props) {
         visible={false}
         timeRemaining={timeRemaining}/>
       {players.map((item, index) => (
-        <h5 key={index}>{item.playerName} <span className="text-success">+{item.lastScore}</span></h5>
+        <h5 key={index}>{item.name} <span className="text-success">+{item.lastScore}</span></h5>
       ))}
       <h2>{currentAnswer}</h2>
     </div>

@@ -71,6 +71,25 @@ class Room {
         }
     }
 
+    updatePlayers(nickname) {
+        var index = -1
+        for(var i = 0; i < this.players.length; i++) {
+            index = this.players[i]['name'] === nickname ? i : index
+
+            // check if player disconnected
+            const player = this.players[i]
+            if(Date.now() - player['lastPolled'] > 1000) {
+                this.players.splice(i, 1)
+            }
+        }
+        if(index === -1) {
+            const newPlayer = new Player(nickname)
+            this.players.push(newPlayer)
+        } else {
+            this.players[index].updateLastPolled()
+        }
+    }
+
     nextState() {
         let now = new Date();
         let startTime = new Date(this.startedTime)

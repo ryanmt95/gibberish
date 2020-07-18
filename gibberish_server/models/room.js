@@ -109,6 +109,21 @@ class Room {
         }
     }
 
+    restart() {
+        this.state = STATE.GAME_WAITING;
+        this.round = 0;
+        this.startedTime = null;
+        this.qna = this.generateQuestions();
+        this.timer = Math.floor((new Date() - new Date(this.startedTime))/1000);
+
+        let players = [];
+        for (let player of this.players) {
+            player.resetScore();
+            players.push(player);
+        }
+        this.players = players;
+    }
+
     addPlayer(nickname) {
         const player = new Player(nickname)
         this.players.push(player);

@@ -1,5 +1,4 @@
-var chai = require('chai')
-    , chaiHttp = require('chai-http');
+var chai = require('chai'), chaiHttp = require('chai-http');
 const { assert } = require('chai');
 const roomModel = require("../../models/room")
 

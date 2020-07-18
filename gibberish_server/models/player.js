@@ -18,6 +18,11 @@ class Player {
         this.lastScore = newScore;
     }
 
+    resetScore() {
+        this.totalScore = 0;
+        this.lastScore = 0;
+    }
+
     static deserializePlayer(jsonPlayer) {
         let p = new Player(
             jsonPlayer.playerName,

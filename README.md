@@ -1,14 +1,31 @@
 # Guess The Gibberish
 
-## Single Player Mode
-To run single player mode, run the following commands:
+## Getting Started
+### Prerequisites
+Ensure that you have the following installed
+* npm
+* redis-server
+
+### Installation
+1. Clone the repo
 ```
-cd gibberish_client
+git clone https://github.com/ryanmt95/gibberish.git
+cd gibberish
+```
+2. Install NPM packages
+```
+cd gibberish_server
 npm install
-npm start
+cd ../gibberish_client
+npm install
 ```
-Single player mode allows you to play Guess The Gibberish with 3 computer players! 
-
-Fastest guessers get the most points. 
-
-Win by getting the most points in 5 rounds!
+3. Add a `.env` file in the `gibberish_server` folder and insert this line
+```
+MONGODB_URL="mongodb+srv://gibberish:Escalade242@gibberish.nmufr.mongodb.net/Gibberish?retryWrites=true&w=majority"
+```
+4. Run your redis-server, server and client
+```
+redis-server    // Run the redis-server
+node app.js     // In gibberish_server folder
+npm start       // In gibberish_client folder
+```

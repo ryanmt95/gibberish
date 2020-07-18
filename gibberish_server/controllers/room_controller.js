@@ -1,13 +1,29 @@
 const Player = require("../models/player")
-const roomModel = require("../models/Room")
+const roomModel = require("../models/room")
 
 
 class RoomController {
-    static getRoomData(req, res) {
-        let r = roomModel.getRoomInfoAsObject(req.params["roomId"]);
-        r.nextState();
-        roomModel.saveRoom(r);
-        return roomModel.getRoomInfoAsJson(req.params["roomId"])
+    static async getRoomData(req, res) {
+        roomModel.getRoomInfoAsObject(req.params["roomId"])
+            .then(result => {
+                const {id, state, round, players, timer} = result
+                result.nextState()
+                roomModel.saveRoom(result)
+                res.json({id, state, round, players, timer})
+            })
+            .catch(error => {
+                res.status(400).send(error)
+            })
+    }
+
+    static async getRoomQna(req, res) {
+        roomModel.getRoomInfoAsObject(req.params['roomId'])
+            .then(result => {
+                res.json({qna: result.qna})
+            })
+            .catch(error => {
+                res.status(400).send(error)
+            })
     }
 
     static async createNewRoom(req, res) {
@@ -15,7 +31,7 @@ class RoomController {
         roomModel.saveRoom(r);
         roomModel.getRoomInfoAsJson(r.id)
             .then(result => {
-                res.send(result);
+                res.json(result);
             })
             .catch(error => {
                 res.status(404).send(error);
@@ -24,36 +40,54 @@ class RoomController {
 
     static joinRoom(req, res) {
         // TODO: race conditionSTATE.GAME_WAITING
-        let r = roomModel.Room.deserializeRoom(roomModel.getRoomInfoAsJson(roomId));
-        if (r.state != STATE.GAME_WAITING) return "";
-        for (let p in r.players) {
-            if (p.name == nickname) {
-                return "";
-            }
-        }
-        r.players.push(new Player(nickname))
-        roomModel.saveRoom(r, client);
-        res.sen(r.players[r.length - 1].name);
+        const nickname = req.body.nickname
+        const roomId = req.body.roomId
+        roomModel.getRoomInfoAsObject(roomId)
+            .then(room => {
+                if(room.state != roomModel.STATE.GAME_WAITING) res.status(400).send('Game has started')
+                const index = room.players.findIndex(player => player.playerName == nickname)
+                if(index !== -1) {
+                    res.status(400).send('Nickname already exists. Please choose another nickname!')
+                }
+                room.addPlayer(nickname)
+                roomModel.saveRoom(room)
+                res.json(room)
+            })
+            .catch(error => {
+                res.status(400).send(error)
+            })
     }
 
     static startGame(req, res) {
         let roomId = req.body.roomId;
-        let r = roomModel.getRoomInfoAsObject(roomId);
-        r.start();
-        res.send(roomModel.saveRoom(r));
+        roomModel.getRoomInfoAsObject(roomId)
+            .then(room => {
+                room.start()
+                roomModel.saveRoom(room)
+                res.json(room)
+            })
+            .catch(error => {
+                res.status(400).send(error)
+            })
     }
 
     static submitAnswer(req, res) {
         let roomId = req.body.roomId;
         let nickname = req.body.nickname;
-        let r = roomModel.getRoomInfoAsObject(roomId);
-        let score = new Date() - r.startedTime;
-        for (let p in r.playes) {
-            if (p.name == nickname) {
-                p.updateScore(score);
-                return
-            }
-        }
+        let score = req.body.score;
+        roomModel.getRoomInfoAsObject(roomId)
+            .then(room => {
+                let index = room.players.findIndex(player => player.name === nickname)
+                if(index !== -1) {
+                    room.players[index].updateScore(score)
+                }
+                roomModel.saveRoom(room)
+                const {id, state, round, players, timer} = room
+                res.json({id, state, round, players, timer})
+            })
+            .catch(error => {
+                res.status(400).send(error)
+            })
     }
 }
 module.exports = RoomController;

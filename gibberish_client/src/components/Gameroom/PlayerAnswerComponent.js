@@ -2,7 +2,7 @@ import React from 'react'
 import { gamestates } from './gamestates/GameStates'
 
 function PlayerAnswerComponent(props) {
-	const { gamestate, userAnswer, onAnswerFieldChanged, submitAnswer, helpText } = props
+	const { gamestate, userAnswer, onAnswerFieldChanged, submitAnswer, helpText, userAnswered } = props
 	if (gamestate === gamestates.GAME_WAITING || gamestate === gamestates.GAME_ENDED) {
 		return (
 			<div className="text-center">
@@ -18,7 +18,7 @@ function PlayerAnswerComponent(props) {
 						<input type="text" className="form-control text-center" placeholder="My Guess!" value={userAnswer} onChange={onAnswerFieldChanged} />
 					</div>
 					<h5>{helpText}</h5>
-					<input type="submit" className="btn btn-success" hidden={!(gamestate === gamestates.ROUND_ONGOING)} value="Guess!"/>
+					<input type="submit" className="btn btn-success" hidden={userAnswered} value="Guess!"/>
 				</form>
 			</div>
 		)

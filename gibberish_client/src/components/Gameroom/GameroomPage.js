@@ -1,10 +1,14 @@
 import React from 'react'
+import {Link} from 'react-router-dom'
 import PlayerListComponent from './PlayerListComponent'
 import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
 import { gamestates } from './gamestates/GameStates'
-import { mockqna } from '../../assets/mockqna'
 import API from '../../api/api'
+
+const ROUND_LOADING_TIME = 3
+const ROUND_ONGOING_TIME = 10
+const ROUND_ENDED_TIME = 5
 
 class GameroomPage extends React.Component {
 
@@ -13,103 +17,99 @@ class GameroomPage extends React.Component {
 		this.state = {
 			roomId: props.match.params.id,
 			gamestate: gamestates.GAME_WAITING,
-			currentRound: 1,
-			maxRounds: 5,
-			players: [
-				{name: this.props.nickname, points: 0},
-				{name: "gibberish gary", points: 0},
-				{name: "nonsensical nick", points: 0},
-				{name: "blah blah brenda ", points: 0},
-			],
-			roundScores: [],
-			currentQuestion: '',
-			currentAnswer: '', 
+			currentRound: 0,
+			players: [],
+			qna: [],
 			userAnswer: '',
 			timeRemaining: 0,
-			helpText: ''
+			helpText: '',
+			userAnswered: false
 		}
 	}
 
 	componentDidMount() {
-		this.getQuestion();
+		const {roomId} = this.state
+		this.getRoomQna(roomId)
+		this.timer = setInterval(() => this.getRoomData(roomId), 500)
 	}
 
-	setTimeRemaining = (time) => {
-		this.setState({timeRemaining: time})
+	componentWillUnmount() {
+		clearInterval(this.timer)
 	}
 
-	getQuestion = () => {
-		// API.get('/question')
-		// .then(res => {
-		// 	this.setState({ currentQuestion: res.data.question, currentAnswer: res.data.answer })
-		// })
-		let rand = Math.floor(Math.random() * mockqna.length)
-		let qna = mockqna[rand]
-		this.setState({currentQuestion: qna['question'], currentAnswer: qna['answer']})
-	}
-
-	getRoomDetails = () => {
-		API.get('/room/' + this.state.roomId)
-		.then(res => {
-			this.setState({ 
-				gamestate: res.data.gameState, 
-				currentRound: res.data.currentRound, 
-				players: res.data.players
+	getRoomQna(roomId) {
+		API.get(`/qna/${roomId}`)
+			.then(res => {
+				this.setState({qna: res.data.qna})
 			})
+	}
+
+	getRoomData(roomId) {
+		API.get(`/room/${roomId}`)
+			.then(res => {
+				this.parseRoomData(res.data)
+			})
+	}
+
+	parseRoomData(data) {
+		const { state, round, players, timer } = data 
+		let timeleft
+		let { helpText, userAnswered } = this.state
+		if(state === gamestates.ROUND_LOADING) {
+			timeleft = ROUND_LOADING_TIME - timer
+			helpText = ''
+			userAnswered = false
+		} else if(state === gamestates.ROUND_ONGOING) {
+			timeleft = ROUND_ONGOING_TIME - timer
+		} else if(state === gamestates.ROUND_ENDED) {
+			timeleft = ROUND_ENDED_TIME - timer
+			helpText = ''
+			userAnswered = true
+		} else if(state === gamestates.GAME_ENDED) {
+			clearInterval(this.timer)
+		}
+		// sort players by totalScore, then name
+		const playersSorted = players.sort((a,b) => {
+			if(a.totalScore < b.totalScore) {
+				return 1
+			} else if(a.totalScore > b.totalScore) {
+				return -1
+			} else {
+				return a.playerName < b.playerName ? 1 : -1
+			}
+		})
+		this.setState({
+			players: playersSorted,
+			gamestate: state, 
+			currentRound: round,
+			timeRemaining: timeleft,
+			helpText: helpText,
+			userAnswered: userAnswered
 		})
 	}
 
 	submitAnswer = e => {
 		e.preventDefault()
-		const {currentAnswer, userAnswer, timeRemaining} = this.state
-		if(currentAnswer === userAnswer) {
-			this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
-				this.transitionToState(gamestates.ROUND_ENDED)
-				this.updateScores(timeRemaining)
-			})
-			// API.post('/submit_answer', {
-			// 	roomId: roomId, 
-			// 	nickname: this.props.nickname
-			// }).then(res => console.log(res))
-		} else {
-			this.setState({helpText: 'Please try again!', userAnswer: ''})
-		}
-	}
-
-	startNextRound = () => {
-		if(this.state.currentRound < this.state.maxRounds) {
-			this.setState({currentRound: this.state.currentRound + 1})
-		} else {
-			this.transitionToState(gamestates.GAME_ENDED)
-		}
-		this.getQuestion()
-	}
-
-	transitionToState = (newState) => {
-		if (newState === gamestates.ROUND_LOADING) {
-			this.setState({gamestate: newState, timeRemaining: 3, helpText: '', userAnswer: ''})
-		} else if(newState === gamestates.ROUND_ONGOING) {
-			this.setState({gamestate: newState, timeRemaining: 25, helpText: '', userAnswer: ''})
-		} else if(newState === gamestates.ROUND_ENDED) {
-			this.setState({gamestate: newState, timeRemaining: 5, helpText: '', userAnswer: ''})
-		} else {
-			this.setState({gamestate: newState, helpText: '', userAnswer: ''})
-		}
-	}
-
-	updateScores = (userScore = 0) => {
-		let roundScore = []
-		let players = this.state.players.map(player => {
-			let score = Math.floor(Math.random() * 25)
-			if(player['name'] === this.props.nickname) {
-				score = userScore
+		const { gamestate, userAnswered } = this.state
+		if(gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
+			const { userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
+			const currentAnswer = qna[currentRound-1]['answer']
+			if(currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
+				this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
+					API.post('/submit_answer', {
+						roomId: roomId,
+						nickname: this.props.nickname,
+						score: timeRemaining
+					}).then(res => {
+						this.setState({userAnswered: true}, () => this.parseRoomData(res.data))
+					}).catch(err => {
+						alert(err)
+					})
+				})
+			} else {
+				this.setState({helpText: 'Please try again!', userAnswer: ''})
 			}
-			roundScore.push({name: player.name, points: score})
-			player.points += score
-			return player
-		}).sort((a,b) => (a.points < b.points) ? 1 : -1)
-		roundScore = roundScore.sort((a,b) => (a.points < b.points) ? 1 : -1)
-		this.setState({players: players, roundScores: roundScore})
+		}
 	}
 
 	onAnswerFieldChanged = event => {
@@ -117,27 +117,24 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const { roomId, gamestate, currentRound, maxRounds, players, roundScores, currentQuestion, currentAnswer, userAnswer, timeRemaining, helpText } = this.state
+		const { roomId, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
 		const { nickname } = this.props
 		return (
 			<div className="container">
 				<div className="grid">
+					<Link className='h3 title' to='/'>Guess The Gibberish</Link>
 					<div className="row header">
 						<div id="header" className="col tile">
 							<QuestionCardComponent 
 								roomId={roomId}
 								currentRound={currentRound}
-								maxRounds={maxRounds}
 								gamestate={gamestate}
-								roundScores={roundScores}
 								players={players}
 								startNextRound={this.startNextRound}
 								transitionToState={this.transitionToState}
 								updateScores={this.updateScores}
-								currentQuestion={currentQuestion}
-								currentAnswer={currentAnswer}
-								timeRemaining={timeRemaining}
-								setTimeRemaining={this.setTimeRemaining}/>
+								qna={qna}
+								timeRemaining={timeRemaining}/>
 						</div>
 					</div>
 
@@ -153,6 +150,7 @@ class GameroomPage extends React.Component {
 								gamestate={gamestate}
 								userAnswer={userAnswer}
 								helpText={helpText}
+								userAnswered={userAnswered}
 								onAnswerFieldChanged={this.onAnswerFieldChanged}
 								submitAnswer={this.submitAnswer}/>
 						</div>

@@ -48,15 +48,11 @@ class Room {
     }
 
     toJSON() {
-        let players = []
-        for (let player of this.players) {
-            players.push(player);
-        }
         return {
             roomId: this.id,
             gameState: this.state,
             currentRound: this.round,
-            players: players,
+            players: this.players,
             startedTime: this.startedTime,
             qna: this.qna,
             timer: this.timer

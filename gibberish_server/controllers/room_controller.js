@@ -74,16 +74,20 @@ class RoomController {
     static submitAnswer(req, res) {
         let roomId = req.body.roomId;
         let nickname = req.body.nickname;
-        let score = req.body.score;
+        let score = parseInt(req.body.score);
+        if (isNaN(score)) {
+            res.status(400).send('Score is not an integer')
+        }
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
+                console.log('line80')
+                console.log(room.players)
                 let index = room.players.findIndex(player => player.name === nickname)
                 if (index !== -1) {
                     room.players[index].updateScore(score)
                 }
                 roomModel.saveRoom(room)
-                const { id, state, round, players, timer } = room
-                res.json({ id, state, round, players, timer })
+                res.json(room)
             })
             .catch(error => {
                 res.status(400).send(error)

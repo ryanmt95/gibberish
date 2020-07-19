@@ -4,5 +4,7 @@ node_modules/
 
 dump.rdb
 
+setup.sh
+
 # ******** mac ********
 .DS_Store

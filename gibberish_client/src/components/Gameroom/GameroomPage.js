@@ -14,8 +14,8 @@ class GameroomPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			nickname: props.nickname,
-			roomId: props.roomId,
+			// nickname: props.nickname,
+			// roomId: props.roomId,
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 0,
 			players: [],
@@ -28,7 +28,7 @@ class GameroomPage extends React.Component {
 	}
 
 	componentDidMount() {
-		const {roomId, nickname} = this.state
+		const {roomId, nickname} = this.props
 		this.getRoomQna(roomId)
 		this.timer = setInterval(() => this.getRoomData(roomId, nickname), 500)
 	}
@@ -65,9 +65,7 @@ class GameroomPage extends React.Component {
 			timeleft = ROUND_ENDED_TIME - timer
 			helpText = ''
 			userAnswered = true
-		} else if(state === gamestates.GAME_ENDED) {
-			clearInterval(this.timer)
-		}
+		} 
 		// sort players by totalScore, then name
 		const playersSorted = players.sort((a,b) => {
 			if(a.totalScore < b.totalScore) {
@@ -92,7 +90,8 @@ class GameroomPage extends React.Component {
 		e.preventDefault()
 		const { gamestate, userAnswered } = this.state
 		if(gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
-			const { nickname, userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
+			const { userAnswer, timeRemaining, currentRound, qna } = this.state
+			const { nickname, roomId } = this.props
 			const currentAnswer = qna[currentRound-1]['answer']
 			if(currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
 				this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
@@ -118,7 +117,7 @@ class GameroomPage extends React.Component {
 
 	handlePlayAgain = e => {
 		e.preventDefault()
-		const {roomId, nickname} = this.state
+		const {roomId, nickname} = this.props
 		API.post('/restart_game', {
 			roomId: roomId
 		}).then(res => {
@@ -130,7 +129,8 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const { nickname, roomId, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
+		const { gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
+		const { nickname, roomId } = this.props
 		return (
 			<div className="container">
 				<div className="grid">

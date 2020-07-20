@@ -111,7 +111,6 @@ class Room {
                 }
                 let allAnswered = true
                 for(let player of this.players) {
-                    console.log(player.answered)
                     allAnswered = allAnswered && player['answered']
                 }
                 if(allAnswered) {

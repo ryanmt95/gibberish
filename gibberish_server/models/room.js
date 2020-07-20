@@ -27,6 +27,8 @@ Object.freeze(STATE);
 const ROUND_NUMBER = 10;
 Object.freeze(ROUND_NUMBER);
 
+const DISCONNECT_MS = 1500
+
 class Room {
     constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = [], startedTime = null, qna = this.generateQuestions()) {
         this.id = id;
@@ -64,6 +66,25 @@ class Room {
             this.state = STATE.ROUND_LOADING;
             this.startedTime = new Date();
             this.round++
+        }
+    }
+
+    updatePlayers(nickname) {
+        var index = -1
+        for(var i = 0; i < this.players.length; i++) {
+            index = this.players[i]['name'] === nickname ? i : index
+
+            // check if player disconnected
+            const player = this.players[i]
+            if(Date.now() - player['lastPolled'] > DISCONNECT_MS) {
+                this.players.splice(i, 1)
+            }
+        }
+        if(index === -1) {
+            const newPlayer = new Player(nickname)
+            this.players.push(newPlayer)
+        } else {
+            this.players[index].updateLastPolled()
         }
     }
 

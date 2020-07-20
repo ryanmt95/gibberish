@@ -45,7 +45,7 @@ class GameroomPage extends React.Component {
 	}
 
 	getRoomData(roomId) {
-		API.get(`/room/${roomId}`)
+		API.get(`/room/${roomId}/${this.props.nickname}`)
 			.then(res => {
 				this.parseRoomData(res.data)
 			})
@@ -75,7 +75,7 @@ class GameroomPage extends React.Component {
 			} else if(a.totalScore > b.totalScore) {
 				return -1
 			} else {
-				return a.playerName < b.playerName ? 1 : -1
+				return a.name < b.name ? 1 : -1
 			}
 		})
 		this.setState({

@@ -27,6 +27,8 @@ Object.freeze(STATE);
 const ROUND_NUMBER = 10;
 Object.freeze(ROUND_NUMBER);
 
+const DISCONNECT_MS = 1500
+
 class Room {
     constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = [], startedTime = null, qna = this.generateQuestions()) {
         this.id = id;
@@ -78,7 +80,7 @@ class Room {
 
             // check if player disconnected
             const player = this.players[i]
-            if(Date.now() - player['lastPolled'] > 1000) {
+            if(Date.now() - player['lastPolled'] > DISCONNECT_MS) {
                 this.players.splice(i, 1)
             }
         }

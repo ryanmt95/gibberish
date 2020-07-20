@@ -46,10 +46,14 @@ class RoomController {
         const roomId = req.body.roomId
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
-                if(room.state != roomModel.STATE.GAME_WAITING) res.status(400).send('Game has started')
+                if(room.state != roomModel.STATE.GAME_WAITING) {
+                    res.status(400).send('Game has started')
+                    return
+                }
                 const index = room.players.findIndex(player => player.name == nickname)
                 if(index !== -1) {
                     res.status(400).send('Nickname already exists. Please choose another nickname!')
+                    return
                 }
                 room.addPlayer(nickname)
                 roomModel.saveRoom(room)

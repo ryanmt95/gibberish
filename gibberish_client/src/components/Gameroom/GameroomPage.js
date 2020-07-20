@@ -1,5 +1,4 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
 import PlayerListComponent from './PlayerListComponent'
 import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
@@ -7,7 +6,7 @@ import { gamestates } from './gamestates/GameStates'
 import API from '../../api/api'
 
 const ROUND_LOADING_TIME = 3
-const ROUND_ONGOING_TIME = 10
+const ROUND_ONGOING_TIME = 25
 const ROUND_ENDED_TIME = 5
 
 class GameroomPage extends React.Component {
@@ -15,7 +14,8 @@ class GameroomPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			roomId: props.match.params.id,
+			// nickname: props.nickname,
+			// roomId: props.roomId,
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 0,
 			players: [],
@@ -28,9 +28,9 @@ class GameroomPage extends React.Component {
 	}
 
 	componentDidMount() {
-		const {roomId} = this.state
+		const {roomId, nickname} = this.props
 		this.getRoomQna(roomId)
-		this.timer = setInterval(() => this.getRoomData(roomId), 500)
+		this.timer = setInterval(() => this.getRoomData(roomId, nickname), 500)
 	}
 
 	componentWillUnmount() {
@@ -44,8 +44,8 @@ class GameroomPage extends React.Component {
 			})
 	}
 
-	getRoomData(roomId) {
-		API.get(`/room/${roomId}/${this.props.nickname}`)
+	getRoomData(roomId, nickname) {
+		API.get(`/room/${roomId}/${nickname}`)
 			.then(res => {
 				this.parseRoomData(res.data)
 			})
@@ -65,9 +65,7 @@ class GameroomPage extends React.Component {
 			timeleft = ROUND_ENDED_TIME - timer
 			helpText = ''
 			userAnswered = true
-		} else if(state === gamestates.GAME_ENDED) {
-			clearInterval(this.timer)
-		}
+		} 
 		// sort players by totalScore, then name
 		const playersSorted = players.sort((a,b) => {
 			if(a.totalScore < b.totalScore) {
@@ -92,13 +90,14 @@ class GameroomPage extends React.Component {
 		e.preventDefault()
 		const { gamestate, userAnswered } = this.state
 		if(gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
-			const { userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
+			const { userAnswer, timeRemaining, currentRound, qna } = this.state
+			const { nickname, roomId } = this.props
 			const currentAnswer = qna[currentRound-1]['answer']
 			if(currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
 				this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
 					API.post('/submit_answer', {
 						roomId: roomId,
-						nickname: this.props.nickname,
+						nickname: nickname,
 						score: timeRemaining
 					}).then(res => {
 						this.setState({userAnswered: true}, () => this.parseRoomData(res.data))
@@ -118,24 +117,24 @@ class GameroomPage extends React.Component {
 
 	handlePlayAgain = e => {
 		e.preventDefault()
-		const {roomId} = this.state
+		const {roomId, nickname} = this.props
 		API.post('/restart_game', {
 			roomId: roomId
 		}).then(res => {
 			this.getRoomQna(roomId)
-			this.timer = setInterval(() => this.getRoomData(roomId), 500)
+			this.timer = setInterval(() => this.getRoomData(roomId, nickname), 500)
 		}).catch(err => {
 			alert(err)
 		})
 	}
 
 	render() {
-		const { roomId, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
-		const { nickname } = this.props
+		const { gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
+		const { nickname, roomId } = this.props
 		return (
 			<div className="container">
 				<div className="grid">
-					<Link className='h3 title' to='/'>Guess The Gibberish</Link>
+					<a href='/' className='h3 title'>Guess The Gibberish</a>
 					<div className="row header">
 						<div id="header" className="col tile">
 							<QuestionCardComponent 

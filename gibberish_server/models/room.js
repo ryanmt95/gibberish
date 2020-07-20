@@ -105,7 +105,7 @@ class Room {
                 }
                 break;
             case STATE.ROUND_ONGOING:
-                if (now - startTime > 10000) {
+                if (now - startTime > 25000) {
                     this.state = STATE.ROUND_ENDED;
                     this.startedTime = now;
                 }

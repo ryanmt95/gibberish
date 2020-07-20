@@ -68,7 +68,6 @@ class LandingPage extends React.Component {
         API.post('/join_room', {nickname: nickname, roomId: roomId})
             .then(res => {
                 this.props.updateRoomId(roomId)
-                // this.props.history.push(`room/${roomCode}`);
                 this.props.toGameroomPage()
             })
             .catch(err => {

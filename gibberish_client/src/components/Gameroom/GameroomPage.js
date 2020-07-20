@@ -6,7 +6,7 @@ import { gamestates } from './gamestates/GameStates'
 import API from '../../api/api'
 
 const ROUND_LOADING_TIME = 3
-const ROUND_ONGOING_TIME = 10
+const ROUND_ONGOING_TIME = 25
 const ROUND_ENDED_TIME = 5
 
 class GameroomPage extends React.Component {

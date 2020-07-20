@@ -21,7 +21,7 @@ class RoomController {
     static async getRoomQna(req, res) {
         roomModel.getRoomInfoAsObject(req.params['roomId'])
             .then(result => {
-                res.json({qna: result.qna})
+                res.json({ qna: result.qna })
             })
             .catch(error => {
                 res.status(400).send(error)
@@ -80,12 +80,12 @@ class RoomController {
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
                 let index = room.players.findIndex(player => player.name === nickname)
-                if(index !== -1) {
+                if (index !== -1) {
                     room.players[index].updateScore(score)
                 }
                 roomModel.saveRoom(room)
-                const {id, state, round, players, timer} = room
-                res.json({id, state, round, players, timer})
+                const { id, state, round, players, timer } = room
+                res.json({ id, state, round, players, timer })
             })
             .catch(error => {
                 res.status(400).send(error)

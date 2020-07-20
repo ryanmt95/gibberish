@@ -109,12 +109,21 @@ class Room {
                     this.state = STATE.ROUND_ENDED;
                     this.startedTime = now;
                 }
+                let allAnswered = true
+                for(let player of this.players) {
+                    console.log(player.answered)
+                    allAnswered = allAnswered && player['answered']
+                }
+                if(allAnswered) {
+                    this.state = STATE.ROUND_ENDED;
+                    this.startedTime = now;
+                }
                 break;
             case STATE.ROUND_ENDED:
                 if (now - startTime > 5000) {
                     // reset last score
                     for (var i = 0; i < this.players.length; i++) {
-                        this.players[i]['lastScore'] = 0
+                        this.players[i].resetLastScore()
                     }
                     if (this.round < ROUND_NUMBER) {
                         this.state = STATE.ROUND_LOADING;

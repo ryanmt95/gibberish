@@ -35,12 +35,12 @@ class Room {
         this.players = players;
         this.startedTime = startedTime;
         this.qna = qna
-        this.timer = Math.floor((new Date() - new Date(this.startedTime))/1000)
+        this.timer = Math.floor((new Date() - new Date(this.startedTime)) / 1000)
     }
 
     generateQuestions() {
         let qna = new Set()
-        while(qna.size < ROUND_NUMBER) {
+        while (qna.size < ROUND_NUMBER) {
             const r = Math.floor(Math.random() * questions.length)
             qna.add(questions[r])
         }
@@ -48,15 +48,11 @@ class Room {
     }
 
     toJSON() {
-        let players = []
-        for (let player of this.players) {
-            players.push(player);
-        }
         return {
             roomId: this.id,
             gameState: this.state,
             currentRound: this.round,
-            players: players,
+            players: this.players,
             startedTime: this.startedTime,
             qna: this.qna,
             timer: this.timer
@@ -111,13 +107,13 @@ class Room {
             case STATE.ROUND_ENDED:
                 if (now - startTime > 5000) {
                     // reset last score
-                    for(var i = 0; i < this.players.length; i++) {
+                    for (var i = 0; i < this.players.length; i++) {
                         this.players[i]['lastScore'] = 0
                     }
                     if (this.round < ROUND_NUMBER) {
                         this.state = STATE.ROUND_LOADING;
                         this.startedTime = now;
-                        this.round ++
+                        this.round++
                     } else {
                         this.state = STATE.GAME_ENDED;
                     }
@@ -154,7 +150,7 @@ class Room {
             const p = Player.deserializePlayer(player)
             players.push(p); // convert to player
         }
-        let r = new Room(jsonRoom.roomId,jsonRoom.gameState,jsonRoom.currentRound,players, jsonRoom.startedTime, jsonRoom.qna);
+        let r = new Room(jsonRoom.roomId, jsonRoom.gameState, jsonRoom.currentRound, players, jsonRoom.startedTime, jsonRoom.qna);
         return r;
     }
 }

@@ -30,21 +30,25 @@ Object.freeze(ROUND_NUMBER);
 const DISCONNECT_MS = 1500
 
 class Room {
-    constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = [], startedTime = null, qna = this.generateQuestions()) {
+    constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = [], startedTime = null, qna = this.generateQuestions(), oldQna = new Set()) {
         this.id = id;
         this.state = state;
         this.round = round;
         this.players = players;
         this.startedTime = startedTime;
-        this.qna = qna
-        this.timer = Math.floor((new Date() - new Date(this.startedTime)) / 1000)
+        this.qna = qna;
+        this.oldQna = oldQna;
+        this.timer = Math.floor((new Date() - new Date(this.startedTime)) / 1000);
     }
 
     generateQuestions() {
         let qna = new Set()
         while (qna.size < ROUND_NUMBER) {
             const r = Math.floor(Math.random() * questions.length)
-            qna.add(questions[r])
+            const randomQuestion = questions[r];
+            if (!this.oldQna || (this.oldQna && !this.oldQna.has(randomQuestion))) {
+                qna.add(randomQuestion);
+            }
         }
         return Array.from(qna)
     }
@@ -130,7 +134,12 @@ class Room {
         this.state = STATE.GAME_WAITING;
         this.round = 0;
         this.startedTime = null;
+    
+        for (let qnaObj of this.qna) {
+            this.oldQna.add(qnaObj);
+        }
         this.qna = this.generateQuestions();
+        
         this.timer = Math.floor((new Date() - new Date(this.startedTime))/1000);
 
         let players = [];

@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import GameroomPage from './components/Gameroom/GameroomPage';
 import LandingPage from './components/Joinroom/LandingPage';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import InvalidPage from './components/InvalidPage';
 
 class App extends React.Component {

@@ -7,10 +7,10 @@ class RoomController {
         roomModel.getRoomInfoAsObject(req.params["roomId"])
             .then(result => {
                 const nickname = req.params["playerId"]
+                const {id, state, round, players, timer} = result
                 result.updatePlayers(nickname)
                 result.nextState()
                 roomModel.saveRoom(result)
-                const {id, state, round, players, timer} = result
                 res.json({id, state, round, players, timer})
             })
             .catch(error => {

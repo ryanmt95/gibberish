@@ -8,12 +8,12 @@ class LandingPage extends React.Component {
         this.state = {
             isShowingModal: false,
             clickedButton: '',
-            roomCode: '',
         }
     }
 
     showModal = (buttonName) => {
-        if(buttonName === 'join_room' && this.state.roomCode === '') {
+
+        if(buttonName === 'join_room' && this.props.roomId === '') {
             alert('Please enter a valid room code!')
         } else {
             this.setState({isShowingModal: true, clickedButton: buttonName})
@@ -25,22 +25,21 @@ class LandingPage extends React.Component {
     }
 
     roomCodeFieldChanged = event => {
-        this.setState({roomCode: event.target.value})
+        this.props.updateRoomId(event.target.value)
     }
 
     nicknameFieldChanged = event => {
-        const { updateNickname } = this.props
-        updateNickname(event.target.value)
+        this.props.updateNickname(event.target.value)
     }
 
     submitModal = () => {
         this.setState({isShowingModal: false})
-        const { roomCode, clickedButton} = this.state
-        const { nickname } = this.props
+        const { clickedButton} = this.state
+        const { nickname, roomId } = this.props
 
         if(clickedButton === 'join_room') {
-            if(nickname && roomCode) {
-                this.joinRoom(nickname, roomCode)
+            if(nickname && roomId) {
+                this.joinRoom(nickname, roomId)
             } else {
                 alert('Please input a valid roomCode and nickname')
             }
@@ -65,10 +64,12 @@ class LandingPage extends React.Component {
 	}
 
 
-    joinRoom = (nickname, roomCode) => {
-        API.post('/join_room', {nickname: nickname, roomId: roomCode})
+    joinRoom = (nickname, roomId) => {
+        API.post('/join_room', {nickname: nickname, roomId: roomId})
             .then(res => {
-                this.props.history.push(`room/${roomCode}`);
+                this.props.updateRoomId(roomId)
+                // this.props.history.push(`room/${roomCode}`);
+                this.props.toGameroomPage()
             })
             .catch(err => {
                 err.response ? alert(err.response.data) : alert(err)
@@ -76,7 +77,8 @@ class LandingPage extends React.Component {
     }
 
 	render() {
-        const {isShowingModal, roomCode} = this.state
+        const {isShowingModal} = this.state
+        const {roomId} = this.props
 		return (
             <div>
                 <div className="container" id="landingPage">
@@ -85,7 +87,7 @@ class LandingPage extends React.Component {
                         <br />
                         <div>
                             <div className="input-group w-25 mx-auto">
-                                <input type="text" className="form-control text-center rounded-pill" placeholder="Enter room code" value={roomCode} onChange={this.roomCodeFieldChanged}/>
+                                <input type="text" className="form-control text-center rounded-pill" placeholder="Enter room code" value={roomId} onChange={this.roomCodeFieldChanged}/>
                             </div>
                             <br />
                             <button className="btn btn-warning w-25" id="joinRoomButton" onClick={() => this.showModal('join_room')}>Join room</button>

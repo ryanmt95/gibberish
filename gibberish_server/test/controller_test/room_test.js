@@ -47,7 +47,7 @@ describe('Tests on Room Controller', function () {
             chai.request(app)
                 .post('/join_room')
                 .type('form')
-                .send({ nickname: 'uchiha sasuke', roomId: room.toJSON()['roomId'] })
+                .send({ nickname: 'uchiha sasuke', roomId: room['id'] })
                 .then(function (res) {
 
                     assert.equal(res.status, 200)
@@ -72,7 +72,7 @@ describe('Tests on Room Controller', function () {
             chai.request(app)
                 .post('/join_room')
                 .type('form')
-                .send({ nickname: 'naruto', roomId: room.toJSON()['roomId'] })
+                .send({ nickname: 'naruto', roomId: room['id'] })
                 .then(function (res) {
                     assert.equal(res.status, 400)
                     assert.equal(res.text, 'Nickname already exists. Please choose another nickname!')
@@ -89,7 +89,7 @@ describe('Tests on Room Controller', function () {
             chai.request(app)
                 .post('/join_room')
                 .type('form')
-                .send({ nickname: 'naruto', roomId: room2.toJSON()['roomId'] })
+                .send({ nickname: 'naruto', roomId: room2['id'] })
                 .then(function (res) {
                     assert.equal(res.status, 400)
                     assert.equal(res.text, 'Game has started')
@@ -100,4 +100,64 @@ describe('Tests on Room Controller', function () {
         })
     })
 
+    describe('POST /start_game', function () {
+        it('should change state of gameroom object', function () {
+            var room = new roomModel.Room()
+            roomModel.saveRoom(room)
+            chai.request(app)
+                .post('/start_game')
+                .type('form')
+                .send({ roomId: room['id'] })
+                .then(function (res) {
+                    assert.equal(res.status, 200)
+                    assert.equal(res.body.gameState, 'ROUND_LOADING')
+                })
+                .catch(function (err) {
+                    console.log(err)
+                })
+        })
+    })
+
+    describe('POST /submit_answer', function () {
+        it('should update user score', function () {
+            var nickname = 'pikachu'
+            var score = 10
+            var players = [{ playerName: 'pikachu', totalScore: 10, lastScore: 10 }]
+            var room = new roomModel.Room()
+            room.addPlayer(nickname)
+            room.start()
+            roomModel.saveRoom(room)
+            chai.request(app)
+                .post('/submit_answer')
+                .type('form')
+                .send({ roomId: room['id'], nickname: nickname, score: score })
+                .then(function (res) {
+
+                    assert.equal(res.status, 200)
+
+                    var room = res.body
+                    assert.deepPropertyVal(room, 'players', players)
+                })
+                .catch(function (err) {
+                    console.log(err)
+                })
+        })
+
+        it('should give error if score cannot be parsed to Integer', function () {
+            var nickname = 'pikachu'
+            var score = 'z10'
+            var room = new roomModel.Room()
+            room.addPlayer(nickname)
+            room.start()
+            roomModel.saveRoom(room)
+            chai.request(app)
+                .post('/submit_answer')
+                .type('form')
+                .send({ roomId: room['id'], nickname: nickname, score: score })
+                .then(function (res) {
+                    assert.equal(res.status, 400)
+                    assert.equal(res.text, 'Score is not an integer')
+                })
+        })
+    })
 })

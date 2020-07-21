@@ -80,7 +80,10 @@ class RoomController {
     static submitAnswer(req, res) {
         let roomId = req.body.roomId;
         let nickname = req.body.nickname;
-        let score = req.body.score;
+        let score = parseInt(req.body.score);
+        if (isNaN(score)) {
+            res.status(400).send('Score is not an integer')
+        }
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
                 let index = room.players.findIndex(player => player.name === nickname)

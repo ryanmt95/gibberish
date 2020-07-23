@@ -20,7 +20,7 @@ const questions = [
         answer: "jack of all trades"
     },
     {
-        question: "Boe day tote ships",
+        question: "poe day tote ships",
         answer: "potato chips"
     },
     {

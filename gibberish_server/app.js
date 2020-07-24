@@ -12,6 +12,7 @@ const server = http.createServer(app);
 const io = socketio(server)
 const PORT = 4000;
 
+const questions = require('./sample_questions')
 var rooms = []
 
 io.on('connection', socket => {
@@ -26,7 +27,9 @@ io.on('connection', socket => {
                     {id: socket.id, name: nickname, lastScore: 0, totalScore: 0}
                 ],
                 gamestate: 'GAME_WAITING',
-                currentRound: 0
+                currentRound: 0, 
+                timer: 0,
+                qna: questions.slice(0,10)
             })
         } else {
             rooms[index]['players'].push({id: socket.id, name: nickname, lastScore: 0, totalScore: 0})
@@ -40,25 +43,50 @@ io.on('connection', socket => {
             if(index !== -1) {
                 rooms[i]['players'].splice(index, 1)
             }
-            console.log(rooms[i])
             io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
         }
 
     })
 
-    socket.on('transitionState', ({roomId, nextState}) => {
+    socket.on('startGame', ({roomId}) => {
         const index = rooms.findIndex(room => room['id'] === roomId)
-        if(index === -1) {
-            //invalid room
-        } else {
-            rooms[index]['state'] = nextState
+        if(index !== -1) {
+            rooms[index]['currentRound'] += 1
+            rooms[index]['gamestate'] = 'ROUND_LOADING'
+            rooms[index]['timer'] = 3
+            io.to(roomId).emit('updateRoom', rooms[index])
         }
-        io.to(roomId).emit('updateRoom', rooms[index])
     })
 })
 
 setInterval(() => {
-    io.emit('tick', 'tick')
+    for(var i = 0; i < rooms.length; i++) {
+        if(rooms[i]['timer'] > 0) {
+            rooms[i]['timer']--
+            io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
+        } else {
+            if(rooms[i]['gamestate'] === 'ROUND_LOADING') {
+                rooms[i]['gamestate'] = 'ROUND_ONGOING'
+                rooms[i]['timer'] = 5
+                io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
+            } else if(rooms[i]['gamestate'] === 'ROUND_ONGOING') {
+                rooms[i]['gamestate'] = 'ROUND_ENDED'
+                rooms[i]['timer'] = 5
+                io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
+            } else if(rooms[i]['gamestate'] === 'ROUND_ENDED') {
+                if(rooms[i]['currentRound'] < 10) {
+                    rooms[i]['currentRound'] += 1
+                    rooms[i]['gamestate'] = 'ROUND_LOADING'
+                    rooms[i]['timer'] = 3
+                    io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
+                } else {
+                    rooms[i]['gamestate'] = 'GAME_ENDED'
+                    io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
+                }
+            }
+            
+        }
+    }
 }, 1000)
 
 // connect to mongo database

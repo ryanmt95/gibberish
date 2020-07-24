@@ -34,8 +34,8 @@ class GameroomPage extends React.Component {
 		const socket = socketIOClient(ENDPOINT)
 		socket.emit('joinRoom', {nickname, roomId})
 		socket.on('updateRoom', message => {
-			const {currentRound, gamestate, players} = message
-			this.setState({currentRound, gamestate, players}, () => console.log(this.state))
+			const {currentRound, gamestate, players, qna, timer} = message
+			this.setState({currentRound, gamestate, players, qna, timeRemaining: timer}, () => console.log(this.state))
 		})
 		// const {roomId, nickname} = this.props
 		// this.getRoomQna(roomId)

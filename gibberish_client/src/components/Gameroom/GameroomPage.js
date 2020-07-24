@@ -1,9 +1,11 @@
 import React from 'react'
+import socketIOClient from 'socket.io-client'
 import PlayerListComponent from './PlayerListComponent'
 import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
 import { gamestates } from './gamestates/GameStates'
 import API from '../../api/api'
+const ENDPOINT = 'http://localhost:4000'
 
 const ROUND_LOADING_TIME = 3
 const ROUND_ONGOING_TIME = 25
@@ -28,9 +30,12 @@ class GameroomPage extends React.Component {
 	}
 
 	componentDidMount() {
-		const {roomId, nickname} = this.props
-		this.getRoomQna(roomId)
-		this.timer = setInterval(() => this.getRoomData(roomId, nickname), 500)
+		const {nickname, roomId} = this.props
+		const socket = socketIOClient(ENDPOINT)
+		socket.emit('joinRoom', {nickname, roomId})
+		// const {roomId, nickname} = this.props
+		// this.getRoomQna(roomId)
+		// this.timer = setInterval(() => this.getRoomData(roomId, nickname), 500)
 	}
 
 	componentWillUnmount() {

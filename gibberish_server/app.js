@@ -4,11 +4,20 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('http');
 const mongoose = require('mongoose')
+const socketio = require('socket.io')
 require('dotenv').config()
 
 const app = express();
 const server = http.createServer(app);
+const io = socketio(server)
 const PORT = 4000;
+
+io.on('connection', socket => {
+    socket.on('joinRoom', ({nickname, roomId}) => {
+        console.log(nickname + ' joined room ' + roomId)
+    })
+    socket.on('disconnect', () => console.log('user left'))
+})
 
 // connect to mongo database
 mongoose.connect(process.env.MONGODB_URL, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });

@@ -12,12 +12,54 @@ const server = http.createServer(app);
 const io = socketio(server)
 const PORT = 4000;
 
+var rooms = []
+
 io.on('connection', socket => {
     socket.on('joinRoom', ({nickname, roomId}) => {
-        console.log(nickname + ' joined room ' + roomId)
+        var index = rooms.findIndex(room => room['id'] === roomId)
+        if(index === -1) {
+            // room not created
+            index = rooms.length
+            rooms.push({
+                id: roomId,
+                players: [
+                    {id: socket.id, name: nickname, lastScore: 0, totalScore: 0}
+                ],
+                gamestate: 'GAME_WAITING',
+                currentRound: 0
+            })
+        } else {
+            rooms[index]['players'].push({id: socket.id, name: nickname, lastScore: 0, totalScore: 0})
+        }
+        socket.join(roomId)
+        io.to(roomId).emit('updateRoom', rooms[index])
     })
-    socket.on('disconnect', () => console.log('user left'))
+    socket.on('disconnect', () => {
+        for(var i = 0; i < rooms.length; i++) {
+            const index = rooms[i]['players'].findIndex(player => player.id === socket.id)
+            if(index !== -1) {
+                rooms[i]['players'].splice(index, 1)
+            }
+            console.log(rooms[i])
+            io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
+        }
+
+    })
+
+    socket.on('transitionState', ({roomId, nextState}) => {
+        const index = rooms.findIndex(room => room['id'] === roomId)
+        if(index === -1) {
+            //invalid room
+        } else {
+            rooms[index]['state'] = nextState
+        }
+        io.to(roomId).emit('updateRoom', rooms[index])
+    })
 })
+
+setInterval(() => {
+    io.emit('tick', 'tick')
+}, 1000)
 
 // connect to mongo database
 mongoose.connect(process.env.MONGODB_URL, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });

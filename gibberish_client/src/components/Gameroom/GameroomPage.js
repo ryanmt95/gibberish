@@ -31,7 +31,6 @@ class GameroomPage extends React.Component {
 		this.socket.emit('joinRoom', {nickname, roomId})
 		this.socket.on('updateRoom', message => {
 			const {currentRound, gamestate, players, qna, timer} = message
-			console.log(qna)
 			var {userAnswered, userAnswer, helpText} = this.state
 			if(gamestate === gamestates.ROUND_LOADING) {
 				userAnswered = false

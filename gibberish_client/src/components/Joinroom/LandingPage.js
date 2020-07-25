@@ -1,5 +1,6 @@
 import React from 'react'
 import NicknameModal from "./NicknameModal"
+import InstructionsModal from "./InstructionsModal"
 import API from '../../api/api'
 
 class LandingPage extends React.Component {
@@ -7,12 +8,12 @@ class LandingPage extends React.Component {
         super(props);
         this.state = {
             isShowingModal: false,
+            isShowingInstructions: false,
             clickedButton: '',
         }
     }
 
     showModal = (buttonName) => {
-
         if(buttonName === 'join_room' && this.props.roomId === '') {
             alert('Please enter a valid room code!')
         } else {
@@ -52,6 +53,15 @@ class LandingPage extends React.Component {
             }
         }
     }
+
+    showInstructions = () => {
+        this.setState({isShowingInstructions: true})
+    }
+
+    hideInstructions = () => {
+        this.setState({isShowingInstructions: false})
+    }
+
     
     createRoom = nickname => {
         API.post('/create_room', {nickname: nickname})
@@ -76,7 +86,7 @@ class LandingPage extends React.Component {
     }
 
 	render() {
-        const {isShowingModal} = this.state
+        const {isShowingModal, isShowingInstructions} = this.state
         const {roomId} = this.props
 		return (
             <div>
@@ -95,9 +105,14 @@ class LandingPage extends React.Component {
                         <h6 className="w-25 mx-auto">&nbsp;or&nbsp;</h6>
                         <br />
                         <button className="btn btn-success w-25" id="joinRoomButton" onClick={() => this.showModal('create_room')}>Create new room</button>
+                        <br />
+                        <br />
+                        <br />
+                        <button className="btn" id="instructionsButton" onClick={() => this.showInstructions()}>How to play?</button>
                     </div>
                 </div>
                 {isShowingModal && <NicknameModal isShowingModal={isShowingModal} handleClose={this.hideModal} handleNicknameChange={this.nicknameFieldChanged} submitModal={this.submitModal}/>}
+                {isShowingInstructions && <InstructionsModal isShowingInstructions={isShowingInstructions} handleClose={this.hideInstructions}  />}
             </div>
 		)
 	}

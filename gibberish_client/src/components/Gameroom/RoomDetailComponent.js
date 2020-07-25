@@ -5,7 +5,7 @@ function RoomDetailComponent(props) {
   return(
     <div>
       <h5 className="text-left">RoomID: {roomId}</h5>
-      <h3><strong>Round {currentRound}/10</strong></h3>
+      <h3><strong>Round {currentRound}/5</strong></h3>
     </div>
   )
 }

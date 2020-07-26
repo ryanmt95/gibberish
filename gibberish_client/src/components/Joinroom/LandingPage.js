@@ -10,6 +10,7 @@ class LandingPage extends React.Component {
             isShowingModal: false,
             isShowingInstructions: false,
             clickedButton: '',
+            isButtonLoading: false
         }
     }
 
@@ -34,7 +35,7 @@ class LandingPage extends React.Component {
     }
 
     submitModal = () => {
-        this.setState({isShowingModal: false})
+        this.setState({isButtonLoading: true})
         const { clickedButton} = this.state
         const { nickname, roomId } = this.props
 
@@ -69,6 +70,7 @@ class LandingPage extends React.Component {
                 this.joinRoom(nickname, res.data.roomId)
             })
             .catch(err => {
+                this.setState({isButtonLoading: false})
                 err.response ? alert(err.response.data) : alert(err)
             })
 	}
@@ -81,12 +83,13 @@ class LandingPage extends React.Component {
                 this.props.toGameroomPage()
             })
             .catch(err => {
+                this.setState({isButtonLoading: false})
                 err.response ? alert(err.response.data) : alert(err)
             })
     }
 
 	render() {
-        const {isShowingModal, isShowingInstructions} = this.state
+        const {isShowingModal, isShowingInstructions, isButtonLoading} = this.state
         const {roomId} = this.props
 		return (
             <div>
@@ -111,7 +114,7 @@ class LandingPage extends React.Component {
                         <button className="btn" id="instructionsButton" onClick={() => this.showInstructions()}>How to play?</button>
                     </div>
                 </div>
-                {isShowingModal && <NicknameModal isShowingModal={isShowingModal} handleClose={this.hideModal} handleNicknameChange={this.nicknameFieldChanged} submitModal={this.submitModal}/>}
+                {isShowingModal && <NicknameModal isShowingModal={isShowingModal} isButtonLoading={isButtonLoading} handleClose={this.hideModal} handleNicknameChange={this.nicknameFieldChanged} submitModal={this.submitModal}/>}
                 {isShowingInstructions && <InstructionsModal isShowingInstructions={isShowingInstructions} handleClose={this.hideInstructions}  />}
             </div>
 		)

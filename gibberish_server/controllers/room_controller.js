@@ -1,4 +1,3 @@
-const Player = require("../models/player")
 const roomModel = require("../models/room")
 
 
@@ -28,74 +27,51 @@ class RoomController {
             })
     }
 
-    static async createNewRoom(req, res) {
+    static async createNewRoom() {
         let r = new roomModel.Room();
         roomModel.saveRoom(r);
-        roomModel.getRoomInfoAsJson(r.id)
-            .then(result => {
-                res.json(result);
-            })
-            .catch(error => {
-                res.status(404).send(error);
-            })
+        return roomModel.getRoomInfoAsObject(r.id)
     }
 
-    static joinRoom(req, res) {
-        // TODO: race conditionSTATE.GAME_WAITING
-        const nickname = req.body.nickname
-        const roomId = req.body.roomId
-        roomModel.getRoomInfoAsObject(roomId)
+    static async joinRoom(playerId, nickname, roomId) {
+        return roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
                 if(room.state != roomModel.STATE.GAME_WAITING) {
-                    res.status(400).send('Game has started')
-                    return
+                    return ['err', 'Game has started']
                 }
                 const index = room.players.findIndex(player => player.name == nickname)
                 if(index !== -1) {
-                    res.status(400).send('Nickname already exists. Please choose another nickname!')
-                    return
+                    return ['err', 'Nickname exists']
                 }
-                room.addPlayer(nickname)
+                room.addPlayer(playerId, nickname)
                 roomModel.saveRoom(room)
-                res.json(room)
+                return ['updateRoom', room]
             })
             .catch(error => {
-                res.status(400).send(error)
+                return ['err', error]
             })
     }
 
-    static startGame(req, res) {
-        let roomId = req.body.roomId;
+    static startGame(io, roomId) {
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
                 room.start()
                 roomModel.saveRoom(room)
-                res.json(room)
+                io.to(room['id']).emit('updateRoom', room)
             })
-            .catch(error => {
-                res.status(400).send(error)
-            })
+            .catch(err => console.log(err))
     }
 
-    static submitAnswer(req, res) {
-        let roomId = req.body.roomId;
-        let nickname = req.body.nickname;
-        let score = parseInt(req.body.score);
-        if (isNaN(score)) {
-            res.status(400).send('Score is not an integer')
-        }
+    static submitAnswer(io, roomId, playerId) {
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
-                let index = room.players.findIndex(player => player.name === nickname)
-                if (index !== -1) {
-                    room.players[index].updateScore(score)
+                const index = room['players'].findIndex(player => player.id === playerId)
+                if(index !== -1) {
+                    const score = room['timer']
+                    room['players'][index].updateScore(score)
+                    roomModel.saveRoom(room)
+                    io.to(room['id']).emit('updateRoom', room)
                 }
-                roomModel.saveRoom(room)
-                const { id, state, round, players, timer } = room
-                res.json({ id, state, round, players, timer })
-            })
-            .catch(error => {
-                res.status(400).send(error)
             })
     }
 
@@ -110,6 +86,41 @@ class RoomController {
             .catch(error => {
                 res.status(400).send(error)
             })
+    }
+
+    static playerLeave(io, playerId) {
+        roomModel.getAllRoomId().then(ids => {
+            console.log(ids)
+            for(let id of ids) {
+                roomModel.getRoomInfoAsObject(id).then(room => {
+                    const index = room.containsPlayer(playerId)
+                    if(index !== -1) {
+                        room.removePlayer(index, playerId)
+                        roomModel.saveRoom(room)
+                        if(room.isEmpty()) {
+                            roomModel.deleteRoom(id)
+                        }
+                        io.to(room['id']).emit('updateRoom', room)
+                    }
+                })
+            }
+        })
+    }
+
+    static timerTick(io) {
+        roomModel.getAllRoomId().then(ids => {
+            for(let id of ids) {
+                roomModel.getRoomInfoAsObject(id).then(room => {
+                    if(room['timer'] > 0) {
+                        room.tick()
+                    } else {
+                        room.nextState()
+                    }
+                    roomModel.saveRoom(room)
+                    io.to(room['id']).emit('updateRoom', room)
+                })
+            }
+        })
     }
 }
 module.exports = RoomController;

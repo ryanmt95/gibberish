@@ -54,25 +54,28 @@ class LandingPage extends React.Component {
     }
     
     createRoom = nickname => {
-        API.post('/create_room', {nickname: nickname})
-            .then(res => {
-                this.joinRoom(nickname, res.data.roomId)
-            })
-            .catch(err => {
-                err.response ? alert(err.response.data) : alert(err)
-            })
+        // this.props.updateRoomId(roomId)
+        this.props.toGameroomPage()
+        // API.post('/create_room', {nickname: nickname})
+        //     .then(res => {
+        //         this.joinRoom(nickname, res.data.roomId)
+        //     })
+        //     .catch(err => {
+        //         err.response ? alert(err.response.data) : alert(err)
+        //     })
 	}
 
 
     joinRoom = (nickname, roomId) => {
-        API.post('/join_room', {nickname: nickname, roomId: roomId})
-            .then(res => {
-                this.props.updateRoomId(roomId)
-                this.props.toGameroomPage()
-            })
-            .catch(err => {
-                err.response ? alert(err.response.data) : alert(err)
-            })
+        this.props.toGameroomPage()
+        // API.post('/join_room', {nickname: nickname, roomId: roomId})
+        //     .then(res => {
+        //         this.props.updateRoomId(roomId)
+        //         this.props.toGameroomPage()
+        //     })
+        //     .catch(err => {
+        //         err.response ? alert(err.response.data) : alert(err)
+        //     })
     }
 
 	render() {

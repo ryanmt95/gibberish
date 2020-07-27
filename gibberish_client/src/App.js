@@ -45,6 +45,7 @@ class App extends React.Component {
         component = <GameroomPage
                       nickname={nickname}
                       roomId={roomId}
+                      updateRoomId={this.updateRoomId}
                       toJoinroomPage={this.toJoinroomPage}/>
         break
       default:

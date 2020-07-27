@@ -29,27 +29,41 @@ class GameroomPage extends React.Component {
 		const {nickname, roomId} = this.props
 		this.socket = socketIOClient(ENDPOINT)
 		this.socket.emit('joinRoom', {nickname, roomId})
+		this.socket.on('err', message => {
+			alert(message)
+			this.props.toJoinroomPage()
+		})
 		this.socket.on('updateRoom', message => {
-			const {currentRound, gamestate, players, qna, timer} = message
-			var {userAnswered, userAnswer, helpText} = this.state
-			if(gamestate === gamestates.ROUND_LOADING) {
-				userAnswered = false
-				userAnswer = ''
-			} else if(gamestate === gamestates.ROUND_ENDED) {
-				userAnswered = true
-				userAnswer = ''
-				helpText = ''
-			}
+			console.log(message)
+			const {currentRound, gameState, players, qna, roomId, timer} = message
+			this.props.updateRoomId(roomId)
 			this.setState({
-				currentRound, 
-				gamestate, 
+				currentRound,
+				gamestate: gameState, 
 				players, 
-				qna, 
-				timeRemaining: timer,
-				userAnswer,
-				userAnswered,
-				helpText
+				qna,
+				timeRemaining: timer
 			})
+			// const {currentRound, gamestate, players, qna, timer} = message
+			// var {userAnswered, userAnswer, helpText} = this.state
+			// if(gamestate === gamestates.ROUND_LOADING) {
+			// 	userAnswered = false
+			// 	userAnswer = ''
+			// } else if(gamestate === gamestates.ROUND_ENDED) {
+			// 	userAnswered = true
+			// 	userAnswer = ''
+			// 	helpText = ''
+			// }
+			// this.setState({
+			// 	currentRound, 
+			// 	gamestate, 
+			// 	players, 
+			// 	qna, 
+			// 	timeRemaining: timer,
+			// 	userAnswer,
+			// 	userAnswered,
+			// 	helpText
+			// })
 		})
 	}
 

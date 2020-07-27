@@ -1,4 +1,6 @@
 const questions = require('./sample_questions')
+const RoomController = require('./controllers/room_controller')
+const { saveRoom } = require('./models/room')
 
 var rooms = []
 
@@ -22,66 +24,49 @@ function getRandomQuestions(questionsArr) {
 module.exports = (io) => {
   io.on('connection', socket => {
     socket.on('joinRoom', ({ nickname, roomId }) => {
-      var index = rooms.findIndex(room => room['id'] === roomId)
-      if (index === -1) {
-        // if room not found, create new room
-        index = rooms.length
-        rooms.push({
-          id: roomId,
-          players: [
-            { id: socket.id, name: nickname, lastScore: 0, totalScore: 0 }
-          ],
-          gamestate: 'GAME_WAITING',
-          currentRound: 0,
-          timer: 0,
-          qna: getRandomQuestions([])
-        })
+      if (roomId === '') {
+        RoomController.createNewRoom()
+          .then(room => {
+            RoomController.joinRoom(socket.id, nickname, room['id'])
+              .then(res => {
+                if (res[0] === 'err') {
+                  socket.emit(res[0], res[1])
+                } else {
+                  const room = res[1]
+                  socket.join(room['id'])
+                  io.to(room['id']).emit(res[0], res[1])
+                }
+              })
+          })
       } else {
-        // room exists
-        rooms[index]['players'].push({ id: socket.id, name: nickname, lastScore: 0, totalScore: 0 })
+        RoomController.joinRoom(socket.id, nickname, roomId)
+          .then(res => {
+            if (res[0] === 'err') {
+              socket.emit(res[0], res[1])
+            } else {
+              const room = res[1]
+              socket.join(room['id'])
+              io.to(room['id']).emit(res[0], res[1])
+            }
+          })
       }
-      socket.join(roomId)
-      io.to(roomId).emit('updateRoom', rooms[index])
     })
 
     socket.on('disconnect', () => {
-      // search through all rooms
-      for (var i = 0; i < rooms.length; i++) {
-        const index = rooms[i]['players'].findIndex(player => player.id === socket.id)
-        if (index !== -1) {
-          // if room contains player, remove
-          rooms[i]['players'].splice(index, 1)
-        }
-        // update room with updated player list
-        io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
-      }
+      RoomController.playerLeave(io, socket.id)
     })
 
     socket.on('startGame', ({ roomId }) => {
-      const index = rooms.findIndex(room => room['id'] === roomId)
-      if (index !== -1) {
-        rooms[index]['currentRound'] += 1
-        rooms[index]['gamestate'] = 'ROUND_LOADING'
-        rooms[index]['timer'] = ROUND_LOADING_TIMER
-        io.to(roomId).emit('updateRoom', rooms[index])
-      }
+      RoomController.startGame(io, roomId)
     })
 
     socket.on('submitAnswer', ({ roomId }) => {
-      const index = rooms.findIndex(room => room['id'] === roomId)
-      if (index !== -1) {
-        const i = rooms[index]['players'].findIndex(player => player['id'] === socket.id)
-        if (i !== -1) {
-          const score = rooms[index]['timer']
-          rooms[index]['players'][i]['totalScore'] += score
-          rooms[index]['players'][i]['lastScore'] = score
-        }
-      }
+      RoomController.submitAnswer(io, roomId, socket.id)
     })
 
     socket.on('playAgain', ({ roomId }) => {
       const index = rooms.findIndex(room => room['id'] === roomId)
-      if(index !== -1) {
+      if (index !== -1) {
         rooms[index]['currentRound'] = 1
         rooms[index]['gamestate'] = 'ROUND_LOADING'
         rooms[index]['timer'] = ROUND_LOADING_TIMER
@@ -92,43 +77,6 @@ module.exports = (io) => {
   })
 
   setInterval(() => {
-    for (var i = 0; i < rooms.length; i++) {
-      if (rooms[i]['timer'] > 0) {
-        // decrement timer for all rooms with ongoing timers
-        rooms[i]['timer']--
-        io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
-      } else {
-        if (rooms[i]['gamestate'] === 'ROUND_LOADING') {
-          // if ROUND_LOADING ended
-          for (var j = 0; j < rooms[i]['players'].length; j++) {
-            // reset lastScore values for all players
-            rooms[i]['players'][j]['lastScore'] = 0
-          }
-          // transition to ROUND_ONGOING
-          rooms[i]['gamestate'] = 'ROUND_ONGOING'
-          rooms[i]['timer'] = ROUND_ONGOING_TIMER
-          io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
-        } else if (rooms[i]['gamestate'] === 'ROUND_ONGOING') {
-          // if ROUND_ONGOING ended
-          // transition to ROUND_ENDED
-          rooms[i]['gamestate'] = 'ROUND_ENDED'
-          rooms[i]['timer'] = ROUND_ENDED_TIMER
-          io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
-        } else if (rooms[i]['gamestate'] === 'ROUND_ENDED') {
-          // if ROUND_ENDED ended
-          if (rooms[i]['currentRound'] < MAX_ROUNDS) {
-            // transition to next round if MAX_ROUNDS not reached
-            rooms[i]['currentRound'] += 1
-            rooms[i]['gamestate'] = 'ROUND_LOADING'
-            rooms[i]['timer'] = ROUND_LOADING_TIMER
-            io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
-          } else {
-            // transition to GAME_ENDED if MAX_ROUNDS reached
-            rooms[i]['gamestate'] = 'GAME_ENDED'
-            io.to(rooms[i]['id']).emit('updateRoom', rooms[i])
-          }
-        }
-      }
-    }
+    RoomController.timerTick(io)
   }, 1000)
 }

@@ -23,10 +23,12 @@ const STATE = {
     "GAME_ENDED": "GAME_ENDED"
 }
 Object.freeze(STATE);
-const ROUND_NUMBER = 10;
+const ROUND_NUMBER = 5;
 Object.freeze(ROUND_NUMBER);
 
-const DISCONNECT_MS = 1500
+const ROUND_LOADING_TIMER = 3
+const ROUND_ONGOING_TIMER = 25
+const ROUND_ENDED_TIMER = 5
 
 class Room {
     constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = [], qna = this.generateQuestions(), oldQna = new Set(), timer = 0) {
@@ -97,11 +99,11 @@ class Room {
         switch (this.state) {
             case STATE.ROUND_LOADING:
                 this.state = STATE.ROUND_ONGOING;
-                this.timer = 25;
+                this.timer = ROUND_ONGOING_TIMER;
                 break;
             case STATE.ROUND_ONGOING:
                 this.state = STATE.ROUND_ENDED;
-                this.timer = 5
+                this.timer = ROUND_ENDED_TIMER
                 break;
             case STATE.ROUND_ENDED:
                 if (this.round < ROUND_NUMBER) {
@@ -110,7 +112,7 @@ class Room {
                         this.players[i].resetLastScore()
                     }
                     this.state = STATE.ROUND_LOADING;
-                    this.timer = 3
+                    this.timer = ROUND_LOADING_TIMER
                     this.round++
                 } else {
                     this.state = STATE.GAME_ENDED;
@@ -226,8 +228,14 @@ function getRoomInfoAsObject(roomId) {
 }
 
 function saveRoom(roomObject) {
-    client.set(roomObject.id, JSON.stringify(roomObject), redis.print);
+    client.set(roomObject.id, JSON.stringify(roomObject));
     return roomObject.id;
+}
+
+function clearDB() {
+    return new Promise((res, rej) => {
+        client.flushall()
+    })
 }
 
 module.exports = {
@@ -237,5 +245,6 @@ module.exports = {
     getRoomInfoAsObject: getRoomInfoAsObject,
     saveRoom: saveRoom,
     deleteRoom: deleteRoom,
+    clearDB: clearDB,
     STATE: STATE
 }

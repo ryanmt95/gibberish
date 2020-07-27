@@ -12,8 +12,6 @@ class GameroomPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			// nickname: props.nickname,
-			// roomId: props.roomId,
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 0,
 			players: [],
@@ -36,34 +34,26 @@ class GameroomPage extends React.Component {
 		this.socket.on('updateRoom', message => {
 			console.log(message)
 			const {currentRound, gameState, players, qna, roomId, timer} = message
+			var {userAnswered, userAnswer, helpText} = this.state
+			if(gameState === gamestates.ROUND_LOADING) {
+				userAnswered = false
+				userAnswer = ''
+			} else if(gameState === gamestates.ROUND_ENDED) {
+				userAnswered = true
+				userAnswer = ''
+				helpText = ''
+			}
 			this.props.updateRoomId(roomId)
 			this.setState({
 				currentRound,
 				gamestate: gameState, 
 				players, 
 				qna,
-				timeRemaining: timer
+				timeRemaining: timer,
+				userAnswer,
+				userAnswered,
+				helpText
 			})
-			// const {currentRound, gamestate, players, qna, timer} = message
-			// var {userAnswered, userAnswer, helpText} = this.state
-			// if(gamestate === gamestates.ROUND_LOADING) {
-			// 	userAnswered = false
-			// 	userAnswer = ''
-			// } else if(gamestate === gamestates.ROUND_ENDED) {
-			// 	userAnswered = true
-			// 	userAnswer = ''
-			// 	helpText = ''
-			// }
-			// this.setState({
-			// 	currentRound, 
-			// 	gamestate, 
-			// 	players, 
-			// 	qna, 
-			// 	timeRemaining: timer,
-			// 	userAnswer,
-			// 	userAnswered,
-			// 	helpText
-			// })
 		})
 	}
 

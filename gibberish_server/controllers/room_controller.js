@@ -69,22 +69,25 @@ class RoomController {
                 if(index !== -1) {
                     const score = room['timer']
                     room['players'][index].updateScore(score)
+                    if(room.hasAllAnswered()) {
+                        room.nextState()
+                    }
                     roomModel.saveRoom(room)
+
                     io.to(room['id']).emit('updateRoom', room)
                 }
             })
     }
 
-    static restartGame(req, res) {
-        let roomId = req.body.roomId;
+    static restartGame(io, roomId) {
         roomModel.getRoomInfoAsObject(roomId)
             .then(room => {
                 room.restart()
                 roomModel.saveRoom(room)
-                res.json(room)
+                io.to(room['id']).emit('updateRoom', room)
             })
             .catch(error => {
-                res.status(400).send(error)
+                io.to(room['id']).emit('err', 'Error restarting game')
             })
     }
 
@@ -121,6 +124,11 @@ class RoomController {
                 })
             }
         })
+    }
+
+    static clearDB(req, res) {
+        roomModel.clearDB()
+        res.send('cleared')
     }
 }
 module.exports = RoomController;

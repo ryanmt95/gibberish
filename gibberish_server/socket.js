@@ -65,14 +65,7 @@ module.exports = (io) => {
     })
 
     socket.on('playAgain', ({ roomId }) => {
-      const index = rooms.findIndex(room => room['id'] === roomId)
-      if (index !== -1) {
-        rooms[index]['currentRound'] = 1
-        rooms[index]['gamestate'] = 'ROUND_LOADING'
-        rooms[index]['timer'] = ROUND_LOADING_TIMER
-        rooms[index]['qna'] = getRandomQuestions(rooms[index]['qna']) // get new questions
-        io.to(roomId).emit('updateRoom', rooms[index])
-      }
+      RoomController.restartGame(io, roomId)
     })
   })
 

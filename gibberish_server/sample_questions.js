@@ -1,27 +1,7 @@
 const questions = [
     {
-        question: "jock lit hip goo keys",
-        answer: "chocolate chip cookies"
-    },
-    {
         question: "poe day tote ships",
         answer: "potato chips"
-    },
-    {
-        question: "ha minch ease",
-        answer: "ham and cheese"
-    },
-    {
-        question: "she is burg her",
-        answer: "cheeseburger"
-    },
-    {
-        question: "jock lit prow knees",
-        answer: "chocolate brownies"
-    },
-    {
-        question: "hap pulled use",
-        answer: "apple juice"
     },
     {
         question: "jik hin ugh its",

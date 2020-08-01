@@ -4,10 +4,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('http');
 const mongoose = require('mongoose')
+const socketio = require('socket.io')
 require('dotenv').config()
 
 const app = express();
 const server = http.createServer(app);
+const io = socketio(server)
 const PORT = 4000;
 
 // connect to mongo database
@@ -36,5 +38,6 @@ app.use(bodyParser.urlencoded({
 
 //Routes for application
 require('./routes.js')(app);
+require('./socket.js')(io)
 
 module.exports = app;

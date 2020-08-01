@@ -1,21 +1,17 @@
 import React from 'react'
+import socketIOClient from 'socket.io-client'
 import PlayerListComponent from './PlayerListComponent'
 import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
 import { gamestates } from './gamestates/GameStates'
 import API from '../../api/api'
-
-const ROUND_LOADING_TIME = 3
-const ROUND_ONGOING_TIME = 25
-const ROUND_ENDED_TIME = 5
+const ENDPOINT = 'http://localhost:4000'
 
 class GameroomPage extends React.Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
-			// nickname: props.nickname,
-			// roomId: props.roomId,
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 0,
 			players: [],
@@ -28,61 +24,35 @@ class GameroomPage extends React.Component {
 	}
 
 	componentDidMount() {
-		const {roomId, nickname} = this.props
-		this.getRoomQna(roomId)
-		this.timer = setInterval(() => this.getRoomData(roomId, nickname), 500)
-	}
-
-	componentWillUnmount() {
-		clearInterval(this.timer)
-	}
-
-	getRoomQna(roomId) {
-		API.get(`/qna/${roomId}`)
-			.then(res => {
-				this.setState({qna: res.data.qna})
-			})
-	}
-
-	getRoomData(roomId, nickname) {
-		API.get(`/room/${roomId}/${nickname}`)
-			.then(res => {
-				this.parseRoomData(res.data)
-			})
-	}
-
-	parseRoomData(data) {
-		const { state, round, players, timer } = data 
-		let timeleft
-		let { helpText, userAnswered } = this.state
-		if(state === gamestates.ROUND_LOADING) {
-			timeleft = ROUND_LOADING_TIME - timer
-			helpText = ''
-			userAnswered = false
-		} else if(state === gamestates.ROUND_ONGOING) {
-			timeleft = ROUND_ONGOING_TIME - timer
-		} else if(state === gamestates.ROUND_ENDED) {
-			timeleft = ROUND_ENDED_TIME - timer
-			helpText = ''
-			userAnswered = true
-		} 
-		// sort players by totalScore, then name
-		const playersSorted = players.sort((a,b) => {
-			if(a.totalScore < b.totalScore) {
-				return 1
-			} else if(a.totalScore > b.totalScore) {
-				return -1
-			} else {
-				return a.name < b.name ? 1 : -1
-			}
+		const {nickname, roomId} = this.props
+		this.socket = socketIOClient(ENDPOINT)
+		this.socket.emit('joinRoom', {nickname, roomId})
+		this.socket.on('err', message => {
+			alert(message)
+			this.props.toJoinroomPage()
 		})
-		this.setState({
-			players: playersSorted,
-			gamestate: state, 
-			currentRound: round,
-			timeRemaining: timeleft,
-			helpText: helpText,
-			userAnswered: userAnswered
+		this.socket.on('updateRoom', message => {
+			const {currentRound, gameState, players, qna, roomId, timer} = message
+			var {userAnswered, userAnswer, helpText} = this.state
+			if(gameState === gamestates.ROUND_LOADING) {
+				userAnswered = false
+				userAnswer = ''
+			} else if(gameState === gamestates.ROUND_ENDED) {
+				userAnswered = true
+				userAnswer = ''
+				helpText = ''
+			}
+			this.props.updateRoomId(roomId)
+			this.setState({
+				currentRound,
+				gamestate: gameState, 
+				players, 
+				qna,
+				timeRemaining: timer,
+				userAnswer,
+				userAnswered,
+				helpText
+			})
 		})
 	}
 
@@ -90,20 +60,12 @@ class GameroomPage extends React.Component {
 		e.preventDefault()
 		const { gamestate, userAnswered } = this.state
 		if(gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
-			const { userAnswer, timeRemaining, currentRound, qna } = this.state
-			const { nickname, roomId } = this.props
+			const { userAnswer, currentRound, qna } = this.state
+			const { roomId } = this.props
 			const currentAnswer = qna[currentRound-1]['answer']
 			if(currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
-				this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
-					API.post('/submit_answer', {
-						roomId: roomId,
-						nickname: nickname,
-						score: timeRemaining
-					}).then(res => {
-						this.setState({userAnswered: true}, () => this.parseRoomData(res.data))
-					}).catch(err => {
-						alert(err)
-					})
+				this.setState({helpText: 'Correct!', userAnswer: '', userAnswered: true}, () => {
+					this.socket.emit('submitAnswer', {roomId})
 				})
 			} else {
 				this.setState({helpText: 'Please try again!', userAnswer: ''})
@@ -117,15 +79,8 @@ class GameroomPage extends React.Component {
 
 	handlePlayAgain = e => {
 		e.preventDefault()
-		const {roomId, nickname} = this.props
-		API.post('/restart_game', {
-			roomId: roomId
-		}).then(res => {
-			this.getRoomQna(roomId)
-			this.timer = setInterval(() => this.getRoomData(roomId, nickname), 500)
-		}).catch(err => {
-			alert(err)
-		})
+		const {roomId} = this.props
+		this.socket.emit('playAgain', {roomId})
 	}
 
 	render() {

@@ -1,47 +1,7 @@
 const questions = [
     {
-        question: "jock lit hip goo keys",
-        answer: "chocolate chip cookies"
-    },
-    {
-        question: "high dance eek",
-        answer: "hide and seek"
-    },
-    {
-        question: "reef idge her ate her",
-        answer: "refrigerator"
-    },
-    {
-        question: "is bunch pops queer pans",
-        answer: "spongebob squarepants"
-    },
-    {
-        question: "shack cough alt raids",
-        answer: "jack of all trades"
-    },
-    {
         question: "poe day tote ships",
         answer: "potato chips"
-    },
-    {
-        question: "ha minch ease",
-        answer: "ham and cheese"
-    },
-    {
-        question: "she is burg her",
-        answer: "cheeseburger"
-    },
-    {
-        question: "highs creek own",
-        answer: "ice cream cone"
-    },
-    {
-        question: "jock lit prow knees",
-        answer: "chocolate brownies"
-    },
-    {
-        question: "hap pulled use",
-        answer: "apple juice"
     },
     {
         question: "jik hin ugh its",
@@ -52,77 +12,90 @@ const questions = [
         answer: "frozen yogurt"
     },
     {
-        question: "ewe night ted king dumb",
-        answer: "united kingdom"
+        question: "road ibra tuh",
+        answer: "roti prata"
     },
     {
-        question: "veer off mess sing oat",
-        answer: "fear of missing out"
+        question: "chi can rise",
+        answer: "chicken rice"
     },
     {
-        question: "ban gake sand sir rup",
-        answer: "pancakes and syrup"
+        question: "bar pearl tee",
+        answer: "bubble tea"
     },
     {
-        question: "sad herd day",
-        answer: "saturday"
+        question: "mech spy sea",
+        answer: "mcspicy"
     },
     {
-        question: "tay cove ache a shun",
-        answer: "take a vacation"
+        question: "chi lick rab",
+        answer: "chilli crab"
     },
     {
-        question: "abe autumn lisp hit",
-        answer: "a bottomless pit"
+        question: "fee shed curl ree",
+        answer: "fish head curry"
     },
     {
-        question: "sew fiat tune yawn",
-        answer: "soviet union"
+        question: "nas sill erm mak",
+        answer: "nasi lemak"
     },
     {
-        question: "aid own hutton call fee",
-        answer: "a donut and coffee"
+        question: "some all stink gray",
+        answer: "sambal stingray"
     },
     {
-        question: "mise whims hoot",
-        answer: "my swimsuit"
+        question: "mirr you boose",
+        answer: "mee rebus"
     },
     {
-        question: "abe an an appeal",
-        answer: "a banana peel"
+        question: "charred way tell",
+        answer: "char kway teow"
     },
     {
-        question: "abe ax tree tally",
-        answer: "a backstreet alley"
+        question: "car reap huff",
+        answer: "curry puff"
     },
     {
-        question: "saw hift talk ohs",
-        answer: "soft tacos"
+        question: "car rick she can nu dells",
+        answer: "curry chicken noodles"
     },
     {
-        question: "notch hose anch ease",
-        answer: "nachos and cheese"
+        question: "mail odine no saw",
+        answer: "milo dinosaur"
     },
     {
-        question: "bep her own knee peas uh",
-        answer: "pepperoni pizza"
+        question: "miso toe",
+        answer: "mee soto"
     },
     {
-        question: "ma car own knee anch ease",
-        answer: "macaroni and cheese"
+        question: "bend and kick",
+        answer: "pandan cake"
     },
     {
-        question: "ping hut bud her",
-        answer: "peanut butter"
+        question: "tay tar rick",
+        answer: "teh tarik"
     },
     {
-        question: "dez pus seed hoe",
-        answer: "despacito"
+        question: "eyes lea monty",
+        answer: "iced lemon tea"
     },
     {
-        question: "ail huck each arm",
-        answer: "a lucky charm"
+        question: "can ducky fry eyed chi can",
+        answer: "kentucky fried chicken"
     },
+    {
+        question: "ber girk ying",
+        answer: "burger king"
+    },
+    {
+        question: "peace are hard",
+        answer: "pizza hut"
+    },
+    {
+        question: "shh ache shh aack",
+        answer: "shake shack"
+    }
+    
 ]
 
 module.exports = questions;

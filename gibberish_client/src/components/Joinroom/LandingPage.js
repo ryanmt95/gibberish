@@ -81,6 +81,7 @@ class LandingPage extends React.Component {
                 <div className="container" id="landingPage">
                     <div className="text-center">
                         <h1 id="title">Guess the Gibberish</h1>
+                        <h3 style={{color: '#F4D35E'}}>Singapore Food Edition!</h3>
                         <br />
                         <div>
                             <div className="input-group w-25 mx-auto">

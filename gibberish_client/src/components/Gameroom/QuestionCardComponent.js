@@ -8,7 +8,7 @@ import GameWaiting from './gamestates/GameWaiting'
 import RoomDetailComponent from './RoomDetailComponent'
 
 function QuestionCardComponent(props) {
-  const { roomId, currentRound, gamestate, players, updateScores, qna, timeRemaining  } = props
+  const { loaded, roomId, currentRound, gamestate, players, updateScores, qna, timeRemaining  } = props
 
   let component
   if(gamestate === gamestates.ROUND_LOADING) {
@@ -35,7 +35,8 @@ function QuestionCardComponent(props) {
     <div id="QuestionCardComponent">
       <RoomDetailComponent
         currentRound={currentRound}
-        roomId={roomId}/>
+        roomId={roomId}
+        loaded={loaded}/>
       {component}
     </div>
   )

@@ -19,7 +19,8 @@ class GameroomPage extends React.Component {
 			userAnswer: '',
 			timeRemaining: 0,
 			helpText: '',
-			userAnswered: false
+			userAnswered: false,
+			loaded: false
 		}
 	}
 
@@ -51,7 +52,8 @@ class GameroomPage extends React.Component {
 				timeRemaining: timer,
 				userAnswer,
 				userAnswered,
-				helpText
+				helpText,
+				loaded: true
 			})
 		})
 	}
@@ -84,7 +86,7 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const { gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
+		const { loaded, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
 		const { nickname, roomId } = this.props
 		return (
 			<div className="container">
@@ -101,7 +103,8 @@ class GameroomPage extends React.Component {
 								transitionToState={this.transitionToState}
 								updateScores={this.updateScores}
 								qna={qna}
-								timeRemaining={timeRemaining}/>
+								timeRemaining={timeRemaining}
+								loaded={loaded}/>
 						</div>
 					</div>
 

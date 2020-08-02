@@ -4,8 +4,7 @@ import PlayerListComponent from './PlayerListComponent'
 import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
 import { gamestates } from './gamestates/GameStates'
-import API from '../../api/api'
-const ENDPOINT = 'http://localhost:4000'
+const ENDPOINT = process.env.REACT_APP_BASE_URL || 'http://localhost:4000'
 
 class GameroomPage extends React.Component {
 

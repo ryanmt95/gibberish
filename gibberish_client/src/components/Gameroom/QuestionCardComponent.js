@@ -18,7 +18,8 @@ function QuestionCardComponent(props) {
     component = <RoundOngoing 
                   updateScores={updateScores}
                   currentQuestion={qna[currentRound-1]['question']} 
-                  timeRemaining={timeRemaining}/>
+                  timeRemaining={timeRemaining}
+                  hint={qna[currentRound-1]['hint']}/>
   } else if(gamestate === gamestates.ROUND_ENDED) {
     component = <RoundEnded 
                   players={players}

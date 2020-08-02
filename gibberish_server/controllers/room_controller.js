@@ -69,6 +69,9 @@ class RoomController {
                 if(index !== -1) {
                     const score = room['timer']
                     room['players'][index].updateScore(score)
+                    room['players'].sort((a,b) => {
+                        return b['totalScore'] - a['totalScore']
+                    })
                     if(room.hasAllAnswered()) {
                         room.nextState()
                     }

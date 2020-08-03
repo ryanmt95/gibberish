@@ -15,6 +15,7 @@ class GameroomPage extends React.Component {
 			currentRound: 0,
 			players: [],
 			qna: [],
+			theme: '',
 			userAnswer: '',
 			timeRemaining: 0,
 			helpText: '',
@@ -32,7 +33,7 @@ class GameroomPage extends React.Component {
 			this.props.toJoinroomPage()
 		})
 		this.socket.on('updateRoom', message => {
-			const {currentRound, gameState, players, qna, roomId, timer} = message
+			const {currentRound, gameState, players, qna, theme, roomId, timer} = message
 			var {userAnswered, userAnswer, helpText} = this.state
 			if(gameState === gamestates.ROUND_LOADING) {
 				userAnswered = false
@@ -48,6 +49,7 @@ class GameroomPage extends React.Component {
 				gamestate: gameState, 
 				players, 
 				qna,
+				theme,
 				timeRemaining: timer,
 				userAnswer,
 				userAnswered,
@@ -85,7 +87,7 @@ class GameroomPage extends React.Component {
 	}
 
 	render() {
-		const { loaded, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
+		const { loaded, gamestate, currentRound, players, qna, theme, userAnswer, timeRemaining, helpText, userAnswered } = this.state
 		const { nickname, roomId } = this.props
 		return (
 			<div className="container">
@@ -102,6 +104,7 @@ class GameroomPage extends React.Component {
 								transitionToState={this.transitionToState}
 								updateScores={this.updateScores}
 								qna={qna}
+								theme={theme}
 								timeRemaining={timeRemaining}
 								loaded={loaded}/>
 						</div>

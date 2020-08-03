@@ -8,7 +8,7 @@ import GameWaiting from './gamestates/GameWaiting'
 import RoomDetailComponent from './RoomDetailComponent'
 
 function QuestionCardComponent(props) {
-  const { loaded, roomId, currentRound, gamestate, players, updateScores, qna, timeRemaining  } = props
+  const { loaded, roomId, currentRound, gamestate, players, updateScores, qna, theme, timeRemaining  } = props
 
   let component
   if(gamestate === gamestates.ROUND_LOADING) {
@@ -18,7 +18,8 @@ function QuestionCardComponent(props) {
     component = <RoundOngoing 
                   updateScores={updateScores}
                   currentQuestion={qna[currentRound-1]['question']} 
-                  timeRemaining={timeRemaining}/>
+                  timeRemaining={timeRemaining}
+                  hint={qna[currentRound-1]['hint']}/>
   } else if(gamestate === gamestates.ROUND_ENDED) {
     component = <RoundEnded 
                   players={players}
@@ -29,6 +30,7 @@ function QuestionCardComponent(props) {
   } else if(gamestate === gamestates.GAME_WAITING) {
     component = <GameWaiting 
                   roomId={roomId}
+                  theme={theme}
                   loaded={loaded}/>
   }
 
@@ -37,7 +39,9 @@ function QuestionCardComponent(props) {
       <RoomDetailComponent
         currentRound={currentRound}
         roomId={roomId}
-        loaded={loaded}/>
+        loaded={loaded}
+        gamestate={gamestate}
+        theme={theme}/>
       {component}
     </div>
   )

@@ -8,7 +8,7 @@ import GameWaiting from './gamestates/GameWaiting'
 import RoomDetailComponent from './RoomDetailComponent'
 
 function QuestionCardComponent(props) {
-  const { loaded, roomId, currentRound, gamestate, players, updateScores, qna, timeRemaining  } = props
+  const { loaded, roomId, currentRound, gamestate, players, updateScores, qna, theme, timeRemaining  } = props
 
   let component
   if(gamestate === gamestates.ROUND_LOADING) {
@@ -29,7 +29,8 @@ function QuestionCardComponent(props) {
     component = <GameEnded players={players}/>
   } else if(gamestate === gamestates.GAME_WAITING) {
     component = <GameWaiting 
-                  roomId={roomId}/>
+                  roomId={roomId}
+                  theme={theme}/>
   }
 
   return(
@@ -37,7 +38,9 @@ function QuestionCardComponent(props) {
       <RoomDetailComponent
         currentRound={currentRound}
         roomId={roomId}
-        loaded={loaded}/>
+        loaded={loaded}
+        gamestate={gamestate}
+        theme={theme}/>
       {component}
     </div>
   )

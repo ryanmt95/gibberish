@@ -30,7 +30,8 @@ function QuestionCardComponent(props) {
   } else if(gamestate === gamestates.GAME_WAITING) {
     component = <GameWaiting 
                   roomId={roomId}
-                  theme={theme}/>
+                  theme={theme}
+                  loaded={loaded}/>
   }
 
   return(

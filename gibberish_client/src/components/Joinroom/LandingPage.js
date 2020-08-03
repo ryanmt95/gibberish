@@ -1,7 +1,6 @@
 import React from 'react'
 import NicknameModal from "./NicknameModal"
 import InstructionsModal from "./InstructionsModal"
-import API from '../../api/api'
 
 class LandingPage extends React.Component {
     constructor(props) {

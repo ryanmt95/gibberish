@@ -1,7 +1,6 @@
 import React from 'react'
-import api from '../../../api/api'
 import socketIOClient from 'socket.io-client'
-const ENDPOINT = 'http://localhost:4000'
+const ENDPOINT = process.env.REACT_APP_BASE_URL || 'http://localhost:4000'
 
 
 function startGame(roomId) {
@@ -14,12 +13,12 @@ function startGame(roomId) {
 }
 
 function GameWaiting(props) {
-  const {roomId, theme} = props
+  const {roomId, loaded, theme} = props
   return(
     <div>
       <h3 style={{margin: '30px'}}>Theme: {theme ? theme.toUpperCase() : 'Loading...'}</h3>
       <h5>Waiting for more players to join...</h5>
-      <button className="btn btn-success" onClick={() => startGame(roomId)}>Begin</button>
+      <button disabled={!loaded} className="btn btn-success" onClick={() => startGame(roomId)}>Begin</button>
     </div>
   )
 }

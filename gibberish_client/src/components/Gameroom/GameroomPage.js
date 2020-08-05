@@ -24,20 +24,20 @@ class GameroomPage extends React.Component {
 	}
 
 	componentDidMount() {
-		const {nickname, roomId} = this.props
+		const { nickname, roomId } = this.props
 		this.socket = socketIOClient(ENDPOINT)
-		this.socket.emit('joinRoom', {nickname, roomId})
+		this.socket.emit('joinRoom', { nickname, roomId })
 		this.socket.on('err', message => {
 			alert(message)
 			this.props.toJoinroomPage()
 		})
 		this.socket.on('updateRoom', message => {
-			const {currentRound, gameState, players, qna, roomId, timer} = message
-			var {userAnswered, userAnswer, helpText} = this.state
-			if(gameState === gamestates.ROUND_LOADING) {
+			const { currentRound, gameState, players, qna, roomId, timer } = message
+			var { userAnswered, userAnswer, helpText } = this.state
+			if (gameState === gamestates.ROUND_LOADING) {
 				userAnswered = false
 				userAnswer = ''
-			} else if(gameState === gamestates.ROUND_ENDED) {
+			} else if (gameState === gamestates.ROUND_ENDED) {
 				userAnswered = true
 				userAnswer = ''
 				helpText = ''
@@ -45,8 +45,8 @@ class GameroomPage extends React.Component {
 			this.props.updateRoomId(roomId)
 			this.setState({
 				currentRound,
-				gamestate: gameState, 
-				players, 
+				gamestate: gameState,
+				players,
 				qna,
 				timeRemaining: timer,
 				userAnswer,
@@ -60,28 +60,28 @@ class GameroomPage extends React.Component {
 	submitAnswer = e => {
 		e.preventDefault()
 		const { gamestate, userAnswered } = this.state
-		if(gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
+		if (gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
 			const { userAnswer, currentRound, qna } = this.state
 			const { roomId } = this.props
-			const currentAnswer = qna[currentRound-1]['answer']
-			if(currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
-				this.setState({helpText: 'Correct!', userAnswer: '', userAnswered: true}, () => {
-					this.socket.emit('submitAnswer', {roomId})
+			const currentAnswer = qna[currentRound - 1]['answer']
+			if (currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
+				this.setState({ helpText: 'Correct!', userAnswer: '', userAnswered: true }, () => {
+					this.socket.emit('submitAnswer', { roomId })
 				})
 			} else {
-				this.setState({helpText: 'Please try again!', userAnswer: ''})
+				this.setState({ helpText: 'Please try again!', userAnswer: '' })
 			}
 		}
 	}
 
 	onAnswerFieldChanged = event => {
-		this.setState({ userAnswer: event.target.value})
+		this.setState({ userAnswer: event.target.value })
 	}
 
 	handlePlayAgain = e => {
 		e.preventDefault()
-		const {roomId} = this.props
-		this.socket.emit('playAgain', {roomId})
+		const { roomId } = this.props
+		this.socket.emit('playAgain', { roomId })
 	}
 
 	render() {
@@ -93,7 +93,7 @@ class GameroomPage extends React.Component {
 					<a href='/' className='h3 title'>Guess The Gibberish</a>
 					<div className="row header">
 						<div id="header" className="col tile">
-							<QuestionCardComponent 
+							<QuestionCardComponent
 								roomId={roomId}
 								currentRound={currentRound}
 								gamestate={gamestate}
@@ -103,17 +103,17 @@ class GameroomPage extends React.Component {
 								updateScores={this.updateScores}
 								qna={qna}
 								timeRemaining={timeRemaining}
-								loaded={loaded}/>
+								loaded={loaded} />
 						</div>
 					</div>
 
 					<div className="row">
 						<div id="left" className="col tile">
-							<PlayerListComponent 
-								players={players} 
-								myID={nickname}/>
+							<PlayerListComponent
+								players={players}
+								myID={nickname} />
 						</div>
-						
+
 						<div id="right" className="col tile">
 							<PlayerAnswerComponent
 								gamestate={gamestate}
@@ -122,11 +122,11 @@ class GameroomPage extends React.Component {
 								userAnswered={userAnswered}
 								onAnswerFieldChanged={this.onAnswerFieldChanged}
 								submitAnswer={this.submitAnswer}
-								handlePlayAgain={this.handlePlayAgain}/>
+								handlePlayAgain={this.handlePlayAgain} />
 						</div>
 					</div>
 				</div>
-				
+
 			</div>
 		)
 	}

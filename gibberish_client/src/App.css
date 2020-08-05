@@ -12,7 +12,7 @@
   background-image: url('assets/bg.png');
   background-position: center;
   background-size: cover;
-}
+} 
 
 .tile {
   background-color: #F4D35E;
@@ -195,4 +195,23 @@ h6:before, h6:after {
   text-align: center;
   margin-bottom: 0px;
   padding-top: 8px;
+}
+
+.scrollbar {
+    float: left;
+    height: 96%;
+    width: 100%;
+    padding: 0 5%;
+    overflow-y: scroll;
+    margin-bottom: 25px;
+}
+
+.player_scores {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.player_scores > h5 {
+  flex-grow: 1;
+	width: 33%;
 }

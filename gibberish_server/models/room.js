@@ -31,21 +31,32 @@ const ROUND_ONGOING_TIMER = 25
 const ROUND_ENDED_TIMER = 5
 
 class Room {
-    constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = [], qna = this.generateQuestions(), oldQna = new Set(), timer = 0) {
+    constructor(id = uid(), state = STATE.GAME_WAITING, round = 0, players = [], theme = this.initialiseTheme(), qna = this.generateQuestions(0), oldQna = new Set(), timer = 0, gameNumber = 0) {
         this.id = id;
         this.state = state;
         this.round = round;
         this.players = players;
+        this.theme = theme;
         this.qna = qna;
         this.oldQna = oldQna;
         this.timer = timer;
+        this.gameNumber = gameNumber;
     }
 
-    generateQuestions() {
-        let qna = new Set()
+    initialiseTheme() {
+        return questions[0]['theme'];
+    }
+
+    generateQuestions(gameNum) {
+        let qna = new Set();
+        const numOfThemes = questions.length;
+        const themeQuestions = questions[gameNum%numOfThemes];
+        const theme = themeQuestions['theme'];
+        this.theme = theme;
+        const questionList = themeQuestions['questionList'];
         while (qna.size < ROUND_NUMBER) {
-            const r = Math.floor(Math.random() * questions.length)
-            const randomQuestion = questions[r];
+            const r = Math.floor(Math.random() * questionList.length);
+            const randomQuestion = questionList[r];
             if (!this.oldQna || (this.oldQna && !this.oldQna.has(randomQuestion))) {
                 qna.add(randomQuestion);
             }
@@ -60,7 +71,10 @@ class Room {
             currentRound: this.round,
             players: this.players,
             qna: this.qna,
-            timer: this.timer
+            oldQna: Array.from(this.oldQna),
+            timer: this.timer,
+            theme: this.theme,
+            gameNumber: this.gameNumber
         };
     }
 
@@ -125,11 +139,12 @@ class Room {
         this.state = STATE.GAME_WAITING;
         this.round = 0;
         this.startedTime = null;
+        this.gameNumber += 1;
     
         for (let qnaObj of this.qna) {
             this.oldQna.add(qnaObj);
         }
-        this.qna = this.generateQuestions();
+        this.qna = this.generateQuestions(this.gameNumber);
         
         this.timer = Math.floor((new Date() - new Date(this.startedTime))/1000);
 
@@ -176,7 +191,11 @@ class Room {
             const p = Player.deserializePlayer(player)
             players.push(p); // convert to player
         }
-        let r = new Room(jsonRoom.roomId, jsonRoom.gameState, jsonRoom.currentRound, players, jsonRoom.qna, jsonRoom.oldQna, jsonRoom.timer);
+        let oldQna = new Set();
+        for (const oldQnaObj of jsonRoom.oldQna) {
+            oldQna.add(oldQnaObj);
+        }
+        let r = new Room(jsonRoom.roomId, jsonRoom.gameState, jsonRoom.currentRound, players, jsonRoom.theme, jsonRoom.qna, oldQna, jsonRoom.timer, jsonRoom.gameNumber);
         return r;
     }
 }

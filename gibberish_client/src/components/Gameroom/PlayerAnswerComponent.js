@@ -2,11 +2,17 @@ import React from 'react'
 import { gamestates } from './gamestates/GameStates'
 
 function PlayerAnswerComponent(props) {
-	const { gamestate, userAnswer, onAnswerFieldChanged, submitAnswer, helpText, userAnswered } = props
-	if (gamestate === gamestates.GAME_WAITING || gamestate === gamestates.GAME_ENDED) {
+	const { gamestate, userAnswer, onAnswerFieldChanged, submitAnswer, helpText, userAnswered, handlePlayAgain } = props
+	if (gamestate === gamestates.GAME_WAITING) {
 		return (
 			<div className="text-center">
 				<h5>Waiting for game to begin...</h5>
+			</div>
+		)
+	} else if (gamestate === gamestates.GAME_ENDED) {
+		return (
+			<div className="text-center">
+				<button className="btn btn-success" onClick={handlePlayAgain}>Play Again!</button>
 			</div>
 		)
 	} else {

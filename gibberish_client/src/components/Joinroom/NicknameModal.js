@@ -1,6 +1,6 @@
 import React from 'react'
 
-function NicknameModal({handleClose, isShowingModal, handleNicknameChange, submitModal}) {
+function NicknameModal({handleClose, isShowingModal, isButtonLoading, handleNicknameChange, submitModal}) {
     const showHideClassName = isShowingModal ? "modal display-block" : "modal display-none"
     return (
         <div className={showHideClassName} role="dialog" aria-hidden="true">
@@ -16,7 +16,7 @@ function NicknameModal({handleClose, isShowingModal, handleNicknameChange, submi
                             <input type="text" className="form-control text-center rounded-pill" placeholder="Nickname" onChange={handleNicknameChange}/>
                         </div>
                         <br />
-                        <button type="button" className='btn btn-success w-25' id="joinRoomButton" onClick={submitModal}>OK</button>
+                        <button type="button" className='btn btn-success w-25' id="joinRoomButton" onClick={submitModal} disabled={isButtonLoading}>{isButtonLoading? 'Loading' : 'OK'}</button>
                     </div>
                 </div>
             </div>

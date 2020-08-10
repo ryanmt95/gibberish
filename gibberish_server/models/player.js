@@ -1,13 +1,15 @@
 class Player {
-    constructor(name, totalScore=0, lastScore=0) {
+    constructor(id, name, totalScore=0, lastScore=0) {
+        this.id = id
         this.name = name;
         this.totalScore = totalScore;
-        this.lastScore = lastScore;
+        this.lastScore = lastScore
     }
 
     toJSON() {
         return {
-            playerName: this.name,
+            id:          this.id,
+            name:        this.name,
             totalScore:  this.totalScore,
             lastScore:   this.lastScore
         };
@@ -18,9 +20,19 @@ class Player {
         this.lastScore = newScore;
     }
 
+    resetLastScore() {
+        this.lastScore = 0
+    }
+
+    resetScore() {
+        this.totalScore = 0;
+        this.lastScore = 0;
+    }
+
     static deserializePlayer(jsonPlayer) {
         let p = new Player(
-            jsonPlayer.playerName,
+            jsonPlayer.id,
+            jsonPlayer.name,
             jsonPlayer.totalScore,
             jsonPlayer.lastScore
         );

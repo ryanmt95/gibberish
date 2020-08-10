@@ -1,17 +1,24 @@
 import React from 'react'
-import api from '../../../api/api'
+import socketIOClient from 'socket.io-client'
+const ENDPOINT = process.env.REACT_APP_BASE_URL || 'http://localhost:4000'
+
 
 function startGame(roomId) {
-  api.post('/start_game', { roomId: roomId })
-    .catch(err => alert(err))
+  console.log(roomId)
+  const socket = socketIOClient(ENDPOINT)
+  socket.emit('startGame', {roomId})
+
+  // api.post('/start_game', { roomId: roomId })
+  //   .catch(err => alert(err))
 }
 
 function GameWaiting(props) {
-  const {roomId} = props
+  const {roomId, loaded, theme} = props
   return(
     <div>
+      <h3 style={{margin: '30px'}}>Theme: {theme ? theme.toUpperCase() : 'Loading...'}</h3>
       <h5>Waiting for more players to join...</h5>
-      <button className="btn btn-success" onClick={() => startGame(roomId)}>Begin</button>
+      <button disabled={!loaded} className="btn btn-success" onClick={() => startGame(roomId)}>Begin</button>
     </div>
   )
 }

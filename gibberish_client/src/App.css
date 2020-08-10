@@ -12,7 +12,7 @@
   background-image: url('assets/bg.png');
   background-position: center;
   background-size: cover;
-}
+} 
 
 .tile {
   background-color: #F4D35E;
@@ -26,7 +26,7 @@
 
 #header {
   text-align: center;
-  height: 320px
+  height: 360px
 }
 
 #left, #right {
@@ -101,6 +101,13 @@ h6:before, h6:after {
   border-radius: 8px;
 }
 
+#instructionsButton {
+  background-color: #7B6AEB;;
+  color: white;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
 .btn-success {
   background-color: #06D6A0;
   border: 0;
@@ -109,6 +116,18 @@ h6:before, h6:after {
 .btn-warning {
   background-color: #F4D35E;
   border: 0;
+}
+
+#instructionsText {
+  padding: 0 10px;
+}
+
+#exampleContainer {
+  border: 5px solid;
+  padding: 10px;
+  border-color: #CCB447;
+  border-radius: 8px;
+  margin: 0 10px;
 }
 
 .modal {
@@ -176,4 +195,23 @@ h6:before, h6:after {
   text-align: center;
   margin-bottom: 0px;
   padding-top: 8px;
+}
+
+.scrollbar {
+    float: left;
+    height: 96%;
+    width: 100%;
+    padding: 0 5%;
+    overflow-y: scroll;
+    margin-bottom: 25px;
+}
+
+.player_scores {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.player_scores > h5 {
+  flex-grow: 1;
+	width: 33%;
 }

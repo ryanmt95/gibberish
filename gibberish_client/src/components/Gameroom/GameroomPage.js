@@ -1,131 +1,101 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
+import socketIOClient from 'socket.io-client'
 import PlayerListComponent from './PlayerListComponent'
 import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
 import { gamestates } from './gamestates/GameStates'
-import API from '../../api/api'
-
-const ROUND_LOADING_TIME = 3
-const ROUND_ONGOING_TIME = 10
-const ROUND_ENDED_TIME = 5
+const ENDPOINT = process.env.REACT_APP_BASE_URL || 'http://localhost:4000'
 
 class GameroomPage extends React.Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
-			roomId: props.match.params.id,
 			gamestate: gamestates.GAME_WAITING,
 			currentRound: 0,
 			players: [],
 			qna: [],
+			theme: '',
 			userAnswer: '',
 			timeRemaining: 0,
 			helpText: '',
-			userAnswered: false
+			userAnswered: false,
+			loaded: false
 		}
 	}
 
 	componentDidMount() {
-		const {roomId} = this.state
-		this.getRoomQna(roomId)
-		this.timer = setInterval(() => this.getRoomData(roomId), 500)
-	}
-
-	componentWillUnmount() {
-		clearInterval(this.timer)
-	}
-
-	getRoomQna(roomId) {
-		API.get(`/qna/${roomId}`)
-			.then(res => {
-				this.setState({qna: res.data.qna})
-			})
-	}
-
-	getRoomData(roomId) {
-		API.get(`/room/${roomId}`)
-			.then(res => {
-				this.parseRoomData(res.data)
-			})
-	}
-
-	parseRoomData(data) {
-		const { state, round, players, timer } = data 
-		let timeleft
-		let { helpText, userAnswered } = this.state
-		if(state === gamestates.ROUND_LOADING) {
-			timeleft = ROUND_LOADING_TIME - timer
-			helpText = ''
-			userAnswered = false
-		} else if(state === gamestates.ROUND_ONGOING) {
-			timeleft = ROUND_ONGOING_TIME - timer
-		} else if(state === gamestates.ROUND_ENDED) {
-			timeleft = ROUND_ENDED_TIME - timer
-			helpText = ''
-			userAnswered = true
-		} else if(state === gamestates.GAME_ENDED) {
-			clearInterval(this.timer)
-		}
-		// sort players by totalScore, then name
-		const playersSorted = players.sort((a,b) => {
-			if(a.totalScore < b.totalScore) {
-				return 1
-			} else if(a.totalScore > b.totalScore) {
-				return -1
-			} else {
-				return a.playerName < b.playerName ? 1 : -1
-			}
+		const { nickname, roomId } = this.props
+		this.socket = socketIOClient(ENDPOINT)
+		this.socket.emit('joinRoom', { nickname, roomId })
+		this.socket.on('err', message => {
+			alert(message)
+			this.props.toJoinroomPage()
 		})
-		this.setState({
-			players: playersSorted,
-			gamestate: state, 
-			currentRound: round,
-			timeRemaining: timeleft,
-			helpText: helpText,
-			userAnswered: userAnswered
+		this.socket.on('updateRoom', message => {
+			const { currentRound, gameState, players, qna, theme, roomId, timer } = message
+			var { userAnswered, userAnswer, helpText } = this.state
+			if (gameState === gamestates.ROUND_LOADING) {
+				userAnswered = false
+				userAnswer = ''
+			} else if (gameState === gamestates.ROUND_ENDED) {
+				userAnswered = true
+				userAnswer = ''
+				helpText = ''
+			}
+			this.props.updateRoomId(roomId)
+			this.setState({
+				currentRound,
+				gamestate: gameState,
+				players,
+				qna,
+				theme,
+				timeRemaining: timer,
+				userAnswer,
+				userAnswered,
+				helpText,
+				loaded: true
+			})
 		})
 	}
 
 	submitAnswer = e => {
 		e.preventDefault()
 		const { gamestate, userAnswered } = this.state
-		if(gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
-			const { userAnswer, timeRemaining, currentRound, roomId, qna } = this.state
-			const currentAnswer = qna[currentRound-1]['answer']
-			if(currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
-				this.setState({helpText: 'Correct!', userAnswer: ''}, () => {
-					API.post('/submit_answer', {
-						roomId: roomId,
-						nickname: this.props.nickname,
-						score: timeRemaining
-					}).then(res => {
-						this.setState({userAnswered: true}, () => this.parseRoomData(res.data))
-					}).catch(err => {
-						alert(err)
-					})
+		if (gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
+			const { userAnswer, currentRound, qna } = this.state
+			const { roomId } = this.props
+			const currentAnswer = qna[currentRound - 1]['answer']
+			if (currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
+				this.setState({ helpText: 'Correct!', userAnswer: '', userAnswered: true }, () => {
+					this.socket.emit('submitAnswer', { roomId })
 				})
 			} else {
-				this.setState({helpText: 'Please try again!', userAnswer: ''})
+				this.setState({ helpText: 'Please try again!', userAnswer: '' })
 			}
 		}
 	}
 
 	onAnswerFieldChanged = event => {
-		this.setState({ userAnswer: event.target.value})
+		this.setState({ userAnswer: event.target.value })
+	}
+
+	handlePlayAgain = e => {
+		e.preventDefault()
+		const { roomId } = this.props
+		this.socket.emit('playAgain', { roomId })
 	}
 
 	render() {
-		const { roomId, gamestate, currentRound, players, qna, userAnswer, timeRemaining, helpText, userAnswered } = this.state
-		const { nickname } = this.props
+		const { loaded, gamestate, currentRound, players, qna, theme, userAnswer, timeRemaining, helpText, userAnswered } = this.state
+		const { nickname, roomId } = this.props
 		return (
 			<div className="container">
 				<div className="grid">
-					<Link className='h3 title' to='/'>Guess The Gibberish</Link>
+					<a href='/' className='h3 title'>Guess The Gibberish</a>
 					<div className="row header">
 						<div id="header" className="col tile">
-							<QuestionCardComponent 
+							<QuestionCardComponent
 								roomId={roomId}
 								currentRound={currentRound}
 								gamestate={gamestate}
@@ -134,17 +104,19 @@ class GameroomPage extends React.Component {
 								transitionToState={this.transitionToState}
 								updateScores={this.updateScores}
 								qna={qna}
-								timeRemaining={timeRemaining}/>
+								theme={theme}
+								timeRemaining={timeRemaining}
+								loaded={loaded} />
 						</div>
 					</div>
 
 					<div className="row">
 						<div id="left" className="col tile">
-							<PlayerListComponent 
-								players={players} 
-								myID={nickname}/>
+							<PlayerListComponent
+								players={players}
+								myID={nickname} />
 						</div>
-						
+
 						<div id="right" className="col tile">
 							<PlayerAnswerComponent
 								gamestate={gamestate}
@@ -152,11 +124,12 @@ class GameroomPage extends React.Component {
 								helpText={helpText}
 								userAnswered={userAnswered}
 								onAnswerFieldChanged={this.onAnswerFieldChanged}
-								submitAnswer={this.submitAnswer}/>
+								submitAnswer={this.submitAnswer}
+								handlePlayAgain={this.handlePlayAgain} />
 						</div>
 					</div>
 				</div>
-				
+
 			</div>
 		)
 	}

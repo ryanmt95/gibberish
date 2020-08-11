@@ -2,6 +2,9 @@ import React from 'react'
 import NicknameModal from "./NicknameModal"
 import InstructionsModal from "./InstructionsModal"
 
+const JOIN_ROOM = 'join_room'
+const CREATE_ROOM = 'create_room'
+
 class LandingPage extends React.Component {
     constructor(props) {
         super(props);
@@ -14,7 +17,7 @@ class LandingPage extends React.Component {
     }
 
     showModal = (buttonName) => {
-        if(buttonName === 'join_room' && this.props.roomId === '') {
+        if(buttonName === JOIN_ROOM && this.props.roomId === '') {
             alert('Please enter a valid room code!')
         } else {
             this.setState({isShowingModal: true, clickedButton: buttonName})
@@ -38,16 +41,16 @@ class LandingPage extends React.Component {
         const { clickedButton} = this.state
         const { nickname, roomId } = this.props
 
-        if(clickedButton === 'join_room') {
+        if(clickedButton === JOIN_ROOM) {
             if(nickname && roomId) {
-                this.joinRoom(nickname, roomId)
+                this.joinRoom()
             } else {
                 alert('Please input a valid roomCode and nickname')
             }
            
-        } else if (clickedButton === 'create_room') {
+        } else if (clickedButton === CREATE_ROOM) {
             if(nickname) {
-                this.createRoom(nickname)
+                this.createRoom()
             } else {
                 alert('Please input a valid nickname')
             }
@@ -62,13 +65,11 @@ class LandingPage extends React.Component {
         this.setState({isShowingInstructions: false})
     }
 
-    
-    createRoom = nickname => {
+    createRoom = () => {
         this.props.toGameroomPage()
 	}
 
-
-    joinRoom = (nickname, roomId) => {
+    joinRoom = () => {
         this.props.toGameroomPage()
     }
 
@@ -83,7 +84,7 @@ class LandingPage extends React.Component {
                         <h3 style={{color: '#F4D35E'}}>Singapore Food Edition!</h3>
                         <br />
                         <div>
-                            <div className="input-group w-25 mx-auto">
+                            <div className="input-group w-50 mx-auto">
                                 <input type="text" className="form-control text-center rounded-pill" placeholder="Enter room code" value={roomId} onChange={this.roomCodeFieldChanged}/>
                             </div>
                             <br />

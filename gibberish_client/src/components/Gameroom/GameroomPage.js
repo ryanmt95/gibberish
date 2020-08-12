@@ -1,3 +1,4 @@
+import crypto from'crypto';
 import React from 'react'
 import socketIOClient from 'socket.io-client'
 import PlayerListComponent from './PlayerListComponent'
@@ -66,7 +67,9 @@ class GameroomPage extends React.Component {
 			const { userAnswer, currentRound, qna } = this.state
 			const { roomId } = this.props
 			const currentAnswer = qna[currentRound - 1]['answer']
-			if (currentAnswer.toLowerCase().trim() === userAnswer.toLowerCase().trim()) {
+			const cleanedUserAns = userAnswer.toLowerCase().trim();
+			const hashedUserAnswer = crypto.createHash('md5').update(cleanedUserAns).digest('hex');
+			if (currentAnswer === hashedUserAnswer) {
 				this.setState({ helpText: 'Correct!', userAnswer: '', userAnswered: true }, () => {
 					this.socket.emit('submitAnswer', { roomId })
 				})

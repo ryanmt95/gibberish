@@ -66,7 +66,7 @@ class GameroomPage extends React.Component {
 			const { userAnswer, currentRound, qna } = this.state
 			const { roomId } = this.props
 			const currentAnswer = qna[currentRound - 1]['answer']
-			if (currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
+			if (currentAnswer.toLowerCase().trim() === userAnswer.toLowerCase().trim()) {
 				this.setState({ helpText: 'Correct!', userAnswer: '', userAnswered: true }, () => {
 					this.socket.emit('submitAnswer', { roomId })
 				})

@@ -33,6 +33,7 @@ class GameroomPage extends React.Component {
 			this.props.toJoinroomPage()
 		})
 		this.socket.on('updateRoom', message => {
+			console.log(message)
 			const { currentRound, gameState, players, qna, theme, roomId, timer } = message
 			var { userAnswered, userAnswer, helpText } = this.state
 			if (gameState === gamestates.ROUND_LOADING) {

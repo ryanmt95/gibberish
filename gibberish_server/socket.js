@@ -18,11 +18,11 @@ const STATE = {
   "GAME_ENDED": "GAME_ENDED"
 }
 
-function getRandomQuestions(questionsArr) {
+function getRandomQuestions(questionsArr, theme) {
   let qna = new Set()
   while (qna.size < MAX_ROUNDS) {
-    const r = Math.floor(Math.random() * questions[0]['questionList'].length)
-    const randomQuestion = questions[0]['questionList'][r];
+    const r = Math.floor(Math.random() * questions[theme]['questionList'].length)
+    const randomQuestion = questions[theme]['questionList'][r];
     qna.add(randomQuestion);
   }
   const arr = Array.from(qna)
@@ -33,12 +33,13 @@ function getRandomQuestions(questionsArr) {
 module.exports = (io) => {
   io.on('connection', socket => {
     socket.on('joinRoom', ({ nickname, roomId }) => {
-      let room 
+      let room
       if (roomId === '') {
         roomId = uid(6)
+        const theme = Math.floor(Math.random() * questions.length)
         room = {
           roomId: roomId,
-          state: STATE.GAME_WAITING,
+          gameState: STATE.GAME_WAITING,
           currentRound: 0,
           players: [{
             id: socket.id,
@@ -46,35 +47,39 @@ module.exports = (io) => {
             totalScore: 0,
             lastScore: 0
           }],
-          theme: questions[0]['theme'],
-          qna: getRandomQuestions([]),
+          theme: questions[theme]['theme'],
+          qna: getRandomQuestions([], theme),
           timer: 0
         }
       } else {
         room = rooms.get(roomId)
-        room['players'].push({
-          id: socket.id,
-          name: nickname,
-          totalScore: 0,
-          lastScore: 0
-        })
+        if (room) {
+          room['players'].push({
+            id: socket.id,
+            name: nickname,
+            totalScore: 0,
+            lastScore: 0
+          })
+        } else {
+          console.log('invalid room')
+          return
+        }
       }
       players.set(socket.id, roomId)
       rooms.set(roomId, room)
       socket.join(roomId)
       io.to(roomId).emit('updateRoom', room)
-      console.log('Rooms:' + rooms.size)
-      console.log('Players:' + players.size)
+      console.log('Rooms:' + Array.from(rooms.keys()))
+      console.log('Players:' + Array.from(players.keys()))
     })
 
     socket.on('disconnect', () => {
       const roomId = players.get(socket.id)
-      if(roomId) {
+      if (roomId) {
         players.delete(socket.id)
       }
       let room = rooms.get(roomId)
-      console.log(room)
-      if(room) {
+      if (room) {
         room['players'] = room['players'].filter(player => player['id'] !== socket.id)
         if (room['players'].length > 0) {
           rooms.set(roomId, room)
@@ -83,22 +88,19 @@ module.exports = (io) => {
           rooms.delete(roomId)
         }
       }
-      console.log('Rooms:' + rooms.size)
-      console.log('Players:' + players.size)
-      // RoomController.playerLeave(io, socket.id)
+      console.log('Rooms:' + Array.from(rooms.keys()))
+      console.log('Players:' + Array.from(players.keys()))
     })
 
     socket.on('startGame', ({ roomId }) => {
       let room = rooms.get(roomId)
-      if (room['state'] == STATE.GAME_WAITING) {
-        room['state'] = STATE.ROUND_LOADING
+      if (room['gameState'] == STATE.GAME_WAITING) {
+        room['gameState'] = STATE.ROUND_LOADING
         room['timer'] = ROUND_LOADING_TIMER
         room['currentRound']++
-        room.set(roomId, room)
+        rooms.set(roomId, room)
         io.to(roomId).emit('updateRoom', room)
       }
-
-      // RoomController.startGame(io, roomId)
     })
 
     socket.on('submitAnswer', ({ roomId }) => {
@@ -110,6 +112,9 @@ module.exports = (io) => {
         player['totalScore'] += score
         player['lastScore'] = score
       }
+      room['players'].sort((a, b) => {
+        return b['totalScore'] - a['totalScore']
+      })
       // check if all answered
       var allAnswered = true
       for (let player of room['players']) {
@@ -117,48 +122,58 @@ module.exports = (io) => {
           allAnswered = false
         }
       }
+      if (allAnswered) {
+        room['gameState'] = STATE.ROUND_ENDED
+        room['timer'] = ROUND_ENDED_TIMER
+      }
       // if all answered goto next state
       rooms.set(roomId, room)
       io.to(roomId).emit('updateRoom', room)
-
-      // RoomController.submitAnswer(io, roomId, socket.id)
     })
 
     socket.on('playAgain', ({ roomId }) => {
-      // RoomController.restartGame(io, roomId)
+      let room = rooms.get(roomId)
+      room['currentRound'] = 0
+      room['gameState'] = STATE.GAME_WAITING
+      const theme = Math.floor(Math.random() * questions.length)
+      room['theme'] = questions[theme]['theme']
+      room['qna'] = getRandomQuestions(room['qna'], theme)
+      rooms.set(roomId, room)
+      io.to(roomId).emit('updateRoom', room)
     })
   })
 
   setInterval(() => {
-    rooms.forEach((roomId, room) => {
+    rooms.forEach((room, roomId, rooms) => {
       if (room['timer'] > 0) {
         room['timer']--
       } else {
-        const currState = room['state']
+        const currState = room['gameState']
         switch (currState) {
           case STATE.ROUND_LOADING:
-            room['state'] = STATE.ROUND_ONGOING
+            room['gameState'] = STATE.ROUND_ONGOING
             room['timer'] = ROUND_ONGOING_TIMER
             break
           case STATE.ROUND_ONGOING:
-            room['state'] = STATE.ROUND_ENDED
+            room['gameState'] = STATE.ROUND_ENDED
             room['timer'] = ROUND_ENDED_TIMER
             break
           case STATE.ROUND_ENDED:
-            if(room['currentRound'] < MAX_ROUNDS) {
-              for(var i = 0; i < room['players'].length; i++) {
+            if (room['currentRound'] < MAX_ROUNDS) {
+              for (var i = 0; i < room['players'].length; i++) {
                 room['players'][i]['lastScore'] = 0
               }
-              room['state'] = STATE.ROUND_LOADING
+              room['gameState'] = STATE.ROUND_LOADING
               room['timer'] = ROUND_LOADING_TIMER
               room['currentRound']++
             } else {
-              room['state'] = STATE.GAME_ENDED
+              room['gameState'] = STATE.GAME_ENDED
             }
             break
         }
       }
       rooms.set(roomId, room)
+      io.to(roomId).emit('updateRoom', room)
     })
     // RoomController.timerTick(io)
   }, 1000)

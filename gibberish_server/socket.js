@@ -1,7 +1,5 @@
 const questions = require('./sample_questions')
 const uid = require("uid");
-// const RoomController = require('./controllers/room_controller')
-// const { saveRoom } = require('./models/room')
 
 var rooms = new Map()
 var players = new Map()
@@ -61,7 +59,7 @@ module.exports = (io) => {
             lastScore: 0
           })
         } else {
-          console.log('invalid room')
+          socket.emit('err', 'Invalid room')
           return
         }
       }
@@ -175,6 +173,5 @@ module.exports = (io) => {
       rooms.set(roomId, room)
       io.to(roomId).emit('updateRoom', room)
     })
-    // RoomController.timerTick(io)
   }, 1000)
 }

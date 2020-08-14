@@ -1,8 +1,10 @@
-const QuestionsController = require('./controllers/questions_controller')
 const RoomController = require('./controllers/room_controller')
 
 module.exports = (app) => {
     app.get('/clear', RoomController.clearDB)
+    app.get('/ping', (req, res) => {
+      res.send('server is running')
+    })
     // app.get('/question', QuestionsController.getRandomQuestion);
     // app.get('/room/:roomId/:playerId', RoomController.getRoomData);
     // app.get('/qna/:roomId', RoomController.getRoomQna)

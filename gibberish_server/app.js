@@ -3,7 +3,7 @@ const logger = require('morgan');
 const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('http');
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
 const socketio = require('socket.io')
 require('dotenv').config()
 
@@ -13,13 +13,13 @@ const io = socketio(server)
 const PORT = 4000;
 
 // connect to mongo database
-mongoose.connect(process.env.MONGODB_URL, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
+// mongoose.connect(process.env.MONGODB_URL, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
-const connection = mongoose.connection;
+// const connection = mongoose.connection;
 
-connection.once("open", function () {
-    console.log("MongoDB database connection established successfully");
-});
+// connection.once("open", function () {
+//     console.log("MongoDB database connection established successfully");
+// });
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

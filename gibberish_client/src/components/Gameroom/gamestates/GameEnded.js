@@ -8,7 +8,7 @@ function GameEnded(props) {
 
   return(
     <div>
-      <h3>Game Over</h3>
+      <h3>Congratulations!</h3>
       <div className="d-flex justify-content-around align-items-center">
         {players.length > 1 ? (
           <div>

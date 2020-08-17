@@ -1,15 +1,9 @@
 import React from 'react'
-import socketIOClient from 'socket.io-client'
-const ENDPOINT = process.env.REACT_APP_BASE_URL || 'http://localhost:4000'
-
+import { Socket } from '../../../api/socket'
 
 function startGame(roomId) {
+  Socket.startGame(roomId)
   console.log(roomId)
-  const socket = socketIOClient(ENDPOINT)
-  socket.emit('startGame', {roomId})
-
-  // api.post('/start_game', { roomId: roomId })
-  //   .catch(err => alert(err))
 }
 
 function GameWaiting(props) {

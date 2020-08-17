@@ -35,7 +35,7 @@ function QuestionCardComponent(props) {
   }
 
   return(
-    <div id="QuestionCardComponent">
+    <div id="QuestionCardComponent" className='tile'>
       <RoomDetailComponent
         currentRound={currentRound}
         roomId={roomId}

@@ -91,6 +91,7 @@ module.exports = (io) => {
     })
 
     socket.on('startGame', ({ roomId }) => {
+      console.log(roomId)
       let room = rooms.get(roomId)
       if (room['gameState'] == STATE.GAME_WAITING) {
         room['gameState'] = STATE.ROUND_LOADING
@@ -138,6 +139,16 @@ module.exports = (io) => {
       room['qna'] = getRandomQuestions(room['qna'], theme)
       rooms.set(roomId, room)
       io.to(roomId).emit('updateRoom', room)
+    })
+
+    socket.on('sendMessage', ({ roomId, message, senderName }) => {
+      let msg = {
+        message: message,
+        senderId: socket.id,
+        senderName: senderName,
+        timestamp: Date.now()
+      }
+      io.to(roomId).emit('updateChat', msg)
     })
   })
 

@@ -67,6 +67,16 @@ module.exports = (io) => {
       rooms.set(roomId, room)
       socket.join(roomId)
       io.to(roomId).emit('updateRoom', room)
+      socket.emit('updateChat', {
+        message: 'Welcome to Guess The Gibberish!',
+        senderId: socket.id,
+        senderName: 'Room'
+      })
+      socket.broadcast.to(roomId).emit('updateChat', {
+        message: nickname + ' joined the room',
+        senderId: socket.id,
+        senderName: 'Room'
+      })
       console.log('Rooms:' + Array.from(rooms.keys()))
       console.log('Players:' + Array.from(players.keys()))
     })
@@ -82,6 +92,11 @@ module.exports = (io) => {
         if (room['players'].length > 0) {
           rooms.set(roomId, room)
           io.to(roomId).emit('updateRoom', room)
+          io.to(roomId).emit('updateChat', {
+            message: 'Someone left the room',
+            senderId: socket.id,
+            senderName: 'Room'
+          })
         } else {
           rooms.delete(roomId)
         }
@@ -105,9 +120,12 @@ module.exports = (io) => {
     socket.on('submitAnswer', ({ roomId }) => {
       let room = rooms.get(roomId)
       const index = room['players'].findIndex(player => player.id === socket.id)
+      let player
+      let score
+
       if (index !== -1) {
-        let player = room['players'][index]
-        let score = room['timer']
+        player = room['players'][index]
+        score = room['timer']
         player['totalScore'] += score
         player['lastScore'] = score
       }
@@ -128,6 +146,10 @@ module.exports = (io) => {
       // if all answered goto next state
       rooms.set(roomId, room)
       io.to(roomId).emit('updateRoom', room)
+      io.to(roomId).emit('updateChat', {
+        message: player['name'] + " guessed correctly! (+" + score + ")" ,
+        senderName: 'Room'
+      })
     })
 
     socket.on('playAgain', ({ roomId }) => {
@@ -145,8 +167,7 @@ module.exports = (io) => {
       let msg = {
         message: message,
         senderId: socket.id,
-        senderName: senderName,
-        timestamp: Date.now()
+        senderName: senderName
       }
       io.to(roomId).emit('updateChat', msg)
     })

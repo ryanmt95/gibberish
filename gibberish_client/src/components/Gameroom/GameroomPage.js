@@ -101,9 +101,6 @@ class GameroomPage extends React.Component {
 								currentRound={currentRound}
 								gamestate={gamestate}
 								players={players}
-								startNextRound={this.startNextRound}
-								transitionToState={this.transitionToState}
-								updateScores={this.updateScores}
 								qna={qna}
 								theme={theme}
 								timeRemaining={timeRemaining}
@@ -112,13 +109,19 @@ class GameroomPage extends React.Component {
 					</div>
 
 					<div className="row">
-						<div className="col-6">
+						<div className="col-12 col-md-6 order-12 order-md-1">
 							<PlayerListComponent
 								players={players}
 								myID={nickname} />
 						</div>
-						<div className="col-6">
-							<ChatComponent roomId={roomId} chat={chat} nickname={nickname} />
+						<div className="col-12 col-md-6 order-1 order-md-12">
+							<ChatComponent 
+								roomId={roomId} 
+								chat={chat} 
+								nickname={nickname} 
+								currentRound={currentRound}
+								qna={qna}
+								gamestate={gamestate}/>
 						</div>
 					</div>
 				</div>

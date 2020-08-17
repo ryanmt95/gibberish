@@ -2,7 +2,7 @@ import React from 'react'
 
 function PlayerListComponent(props) {
 	return (
-		<div className="grid scrollbar tile">
+		<div className="grid tile">
 			<h4 className="pb-4"><strong>Players</strong></h4>
 			{props.players.map((item, index) => (
 				<div className="d-flex mb-2 align-items-center" key={index}>

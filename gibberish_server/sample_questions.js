@@ -3,7 +3,7 @@ const questions = [
         theme: "Local Delicacies",
         questionList: [
             {
-                question: "road ibra tuh",
+                question: "road ibra tah",
                 answer: "roti prata",
                 hint: "It's flat and round, usually eaten with curry!"
             },
@@ -28,7 +28,7 @@ const questions = [
                 hint: " A malay cuisine dish!"
             },
             {
-                question: "some all stink gray",
+                question: "some all stink grey",
                 answer: "sambal stingray",
                 hint: "A type of seafood!"
             },
@@ -68,7 +68,7 @@ const questions = [
                 hint: "White noodles in spicy soup!"
             },
             {
-                question: "carry odd kate",
+                question: "car odd kate",
                 answer: "carrot cake",
                 hint: "Can be black or white!"
             }
@@ -103,14 +103,39 @@ const questions = [
                 hint: "Refreshing, sour yet sweet!"
             },
             {
-                question: "eyes see crim",
+                question: "eyes ker rim",
                 answer: "ice cream",
                 hint: "It melts!"
+            },
+            {
+                question: "dude read yean",
+                answer: "durian",
+                hint: "Some love it, some hate it!"
+            },
+            {
+                question: "ba an dong",
+                answer: "bandung",
+                hint: "A drink that is appealing to the eyes!"
+            },
+            {
+                question: "le haim jews",
+                answer: "lime juice",
+                hint: "Perfect for a hot day!"
+            },
+            {
+                question: "bal her ee",
+                answer: "barley",
+                hint: "Good for your health!"
+            },
+            {
+                question: "shoo girk ain joos",
+                answer: "sugarcane juice",
+                hint: "Watch it get squeezed right in front of you!"
             }
         ]
     },
     {   
-        theme: "Snacks",
+        theme: "Snacks & Fast Food",
         questionList: [
             {
                 question: "poe day tote ships",
@@ -126,14 +151,9 @@ const questions = [
                 question: "car reap huff",
                 answer: "curry puff",
                 hint: "Old Chang Kee's famous for this!"
-            },
+            }, 
             {
-                question: "bend and kick",
-                answer: "pandan cake",
-                hint: "It's soft, fluffy and green!"
-            },   
-            {
-                question: "bar ret tork",
+                question: "ber ret tork",
                 answer: "bread talk",
                 hint: "Famous for floss buns!"
             },
@@ -146,13 +166,7 @@ const questions = [
                 question: "car yacht hose",
                 answer: "kaya toast",
                 hint: "Sweet yet savoury!"
-            }
-        ]
-    },
-    { 
-        theme: "Fast Food",
-        questionList: [
-            {
+            },{
                 question: "mech spy sea",
                 answer: "mcspicy",
                 hint: "It's a little spicy!"
@@ -178,12 +192,17 @@ const questions = [
                 hint: "Did someone say burgers and milkshake?"
             },
             {
-                question: "sa bu ay",
+                question: "sar boo ay",
                 answer: "subway",
                 hint: "A healthy to-go!"
+            },
+            {
+                question: "dough mean ohs",
+                answer: "dominos",
+                hint: "On time delivery guananteed!"
             }
         ]
-    }    
+    }
 ]
 
 module.exports = questions;

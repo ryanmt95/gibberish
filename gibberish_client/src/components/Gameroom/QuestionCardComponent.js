@@ -26,7 +26,7 @@ function QuestionCardComponent(props) {
                   timeRemaining={timeRemaining}
                   currentAnswer={qna[currentRound-1]['answer']}/>
   } else if(gamestate === gamestates.GAME_ENDED) {
-    component = <GameEnded players={players}/>
+    component = <GameEnded players={players} roomId={roomId}/>
   } else if(gamestate === gamestates.GAME_WAITING) {
     component = <GameWaiting 
                   roomId={roomId}

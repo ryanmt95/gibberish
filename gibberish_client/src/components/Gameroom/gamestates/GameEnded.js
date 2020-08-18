@@ -2,13 +2,14 @@ import React from 'react'
 import star_gold from '../../../assets/star_gold.png'
 import star_silver from '../../../assets/star_silver.png'
 import star_bronze from '../../../assets/star_bronze.png'
+import { Socket } from '../../../api/socket'
 
 function GameEnded(props) {
-  const {players} = props
+  const {players, roomId} = props
 
   return(
     <div>
-      <h3>Congratulations!</h3>
+      <button className="btn btn-success" onClick={() => Socket.playAgain(roomId)}>Play Again!</button>
       <div className="d-flex justify-content-around align-items-center">
         {players.length > 1 ? (
           <div>

@@ -29,22 +29,35 @@ function ChatComponent(props) {
   const { roomId, nickname, gamestate, qna, currentRound } = props
   const [message, setmessage] = useState("")
   const [chat, setchat] = useState([])
+  const messagesEndRef = useRef(null)
   useEffect(() => {
     Socket.watchChat(message => {
-      setchat(chat.concat(message))
-      // messagesEndRef.current.scrollIntoView({ behavior: "smooth"})
+      console.log(message)
+      setchat(prev => [...prev, message])
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth"})
     })
     return
-  }, [chat])
+  }, [])
   return (
     <div className='tile'>
       <div style={{ height: '240px', overflowY: 'scroll', backgroundColor: 'white', padding: '8px'}}>
-        {chat.map((item, index) => (
-          <div>
-            <strong>{item.senderName}: </strong>
-            <span>{item.message}</span>
-          </div>
-        ))}
+        {chat.map((item, index) => {
+          if(item.senderName == "") {
+            return (
+              <div>
+                <strong style={{color: 'green'}}>{item.message}</strong>
+              </div>
+            )
+          } else {
+            return (
+              <div>
+                <strong>{item.senderName}: </strong>
+                <span>{item.message}</span>
+              </div>
+            )
+          }
+        })}
+        <div ref={messagesEndRef}></div>
       </div>
       <form onSubmit={e => sendText(e, roomId, message, nickname, gamestate, qna, currentRound, setmessage)}>
         <div className="input-group">

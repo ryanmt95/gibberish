@@ -70,12 +70,12 @@ module.exports = (io) => {
       socket.emit('updateChat', {
         message: 'Welcome to Guess The Gibberish!',
         senderId: socket.id,
-        senderName: 'Room'
+        senderName: ''
       })
       socket.broadcast.to(roomId).emit('updateChat', {
         message: nickname + ' joined the room',
         senderId: socket.id,
-        senderName: 'Room'
+        senderName: ''
       })
       console.log('Rooms:' + Array.from(rooms.keys()))
       console.log('Players:' + Array.from(players.keys()))
@@ -95,7 +95,7 @@ module.exports = (io) => {
           io.to(roomId).emit('updateChat', {
             message: 'Someone left the room',
             senderId: socket.id,
-            senderName: 'Room'
+            senderName: ''
           })
         } else {
           rooms.delete(roomId)
@@ -148,7 +148,7 @@ module.exports = (io) => {
       io.to(roomId).emit('updateRoom', room)
       io.to(roomId).emit('updateChat', {
         message: player['name'] + " guessed correctly! (+" + score + ")" ,
-        senderName: 'Room'
+        senderName: ''
       })
     })
 

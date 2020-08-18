@@ -22,7 +22,6 @@ function QuestionCardComponent(props) {
                   hint={qna[currentRound-1]['hint']}/>
   } else if(gamestate === gamestates.ROUND_ENDED) {
     component = <RoundEnded 
-                  players={players}
                   timeRemaining={timeRemaining}
                   currentAnswer={qna[currentRound-1]['answer']}/>
   } else if(gamestate === gamestates.GAME_ENDED) {

@@ -1,6 +1,5 @@
 import React from 'react'
 import PlayerListComponent from './PlayerListComponent'
-import PlayerAnswerComponent from './PlayerAnswerComponent'
 import QuestionCardComponent from './QuestionCardComponent'
 import { gamestates } from './gamestates/GameStates'
 import ChatComponent from './ChatComponent'
@@ -16,12 +15,8 @@ class GameroomPage extends React.Component {
 			players: [],
 			qna: [],
 			theme: '',
-			userAnswer: '',
 			timeRemaining: 0,
-			helpText: '',
-			userAnswered: false,
-			loaded: false,
-			chat: []
+			loaded: false
 		}
 	}
 
@@ -33,16 +28,7 @@ class GameroomPage extends React.Component {
 			this.props.toJoinroomPage()
 		})
 		Socket.watchUpdates(message => {
-			const { currentRound, gameState, players, qna, theme, roomId, timer, chat } = message
-			var { userAnswered, userAnswer, helpText } = this.state
-			if (gameState === gamestates.ROUND_LOADING) {
-				userAnswered = false
-				userAnswer = ''
-			} else if (gameState === gamestates.ROUND_ENDED) {
-				userAnswered = true
-				userAnswer = ''
-				helpText = ''
-			}
+			const { currentRound, gameState, players, qna, theme, roomId, timer } = message
 			this.props.updateRoomId(roomId)
 			this.setState({
 				currentRound,
@@ -50,45 +36,14 @@ class GameroomPage extends React.Component {
 				players,
 				qna,
 				theme,
-				chat,
 				timeRemaining: timer,
-				userAnswer,
-				userAnswered,
-				helpText,
 				loaded: true
 			})
 		})
 	}
 
-	submitAnswer = e => {
-		e.preventDefault()
-		const { gamestate, userAnswered } = this.state
-		if (gamestate === gamestates.ROUND_ONGOING && !userAnswered) {
-			const { userAnswer, currentRound, qna } = this.state
-			const { roomId } = this.props
-			const currentAnswer = qna[currentRound - 1]['answer']
-			if (currentAnswer.toLowerCase() === userAnswer.toLowerCase()) {
-				this.setState({ helpText: 'Correct!', userAnswer: '', userAnswered: true }, () => {
-					Socket.submitAnswer(roomId)
-				})
-			} else {
-				this.setState({ helpText: 'Please try again!', userAnswer: '' })
-			}
-		}
-	}
-
-	onAnswerFieldChanged = event => {
-		this.setState({ userAnswer: event.target.value })
-	}
-
-	handlePlayAgain = e => {
-		e.preventDefault()
-		const { roomId } = this.props
-		Socket.playAgain(roomId)
-	}
-
 	render() {
-		const { loaded, gamestate, currentRound, players, qna, theme, chat, userAnswer, timeRemaining, helpText, userAnswered } = this.state
+		const { loaded, gamestate, currentRound, players, qna, theme, chat, timeRemaining } = this.state
 		const { nickname, roomId } = this.props
 		return (
 			<div className="container">

@@ -4,7 +4,7 @@ import { Socket } from '../../api/socket'
 function sendText(e, roomId, message, senderName, gamestate, qna, currentRound, setmessage) {
   e.preventDefault()
   if(message !== "") {
-    if(gamestate == 'ROUND_ONGOING') {
+    if(gamestate === 'ROUND_ONGOING') {
       const answer = qna[currentRound - 1]['answer']
       if(message.toLowerCase() === answer.toLowerCase()) {
         Socket.submitAnswer(roomId)
@@ -32,7 +32,6 @@ function ChatComponent(props) {
   const messagesEndRef = useRef(null)
   useEffect(() => {
     Socket.watchChat(message => {
-      console.log(message)
       setchat(prev => [...prev, message])
       messagesEndRef.current.scrollIntoView({ behavior: "smooth"})
     })
@@ -42,15 +41,15 @@ function ChatComponent(props) {
     <div className='tile'>
       <div style={{ height: '240px', overflowY: 'scroll', backgroundColor: 'white', padding: '8px'}}>
         {chat.map((item, index) => {
-          if(item.senderName == "") {
+          if(item.senderName === "") {
             return (
-              <div>
+              <div key={index}>
                 <strong style={{color: 'green'}}>{item.message}</strong>
               </div>
             )
           } else {
             return (
-              <div>
+              <div key={index}>
                 <strong>{item.senderName}: </strong>
                 <span>{item.message}</span>
               </div>
@@ -61,7 +60,7 @@ function ChatComponent(props) {
       </div>
       <form onSubmit={e => sendText(e, roomId, message, nickname, gamestate, qna, currentRound, setmessage)}>
         <div className="input-group">
-          <input type="text" class='form-control' value={message} onChange={e => onMessageFieldChanged(e, setmessage)} />
+          <input type="text" className='form-control' value={message} onChange={e => onMessageFieldChanged(e, setmessage)} />
           <div className="input-group-append">
             <button className="btn btn-success" type='submit'>Send</button>
           </div>

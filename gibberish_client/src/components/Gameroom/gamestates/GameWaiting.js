@@ -3,7 +3,6 @@ import { Socket } from '../../../api/socket'
 
 function startGame(roomId) {
   Socket.startGame(roomId)
-  console.log(roomId)
 }
 
 function GameWaiting(props) {

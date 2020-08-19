@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const uid = require("uid");
 const Player = require("../models/player")
 const questions = require('../sample_questions')
@@ -56,7 +57,10 @@ class Room {
         const questionList = themeQuestions['questionList'];
         while (qna.size < ROUND_NUMBER) {
             const r = Math.floor(Math.random() * questionList.length);
-            const randomQuestion = questionList[r];
+            let randomQuestion = questionList[r];
+            const cleanedAns = randomQuestion.answer.toLowerCase().trim();
+            const hashedAns = crypto.createHash('md5').update(cleanedAns).digest('hex');
+            randomQuestion.answer = hashedAns;
             if (!this.oldQna || (this.oldQna && !this.oldQna.has(randomQuestion))) {
                 qna.add(randomQuestion);
             }
